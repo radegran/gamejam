@@ -1,6 +1,8 @@
 import SVG from "svgjs";
 
-export const ViewPort = (mainSvgId:string) => {
+export type ViewPort = ReturnType<typeof createViewPort>;
+
+export const createViewPort = (mainSvgId:string) => {
     let element:HTMLElement = document.getElementById(mainSvgId);
     let s = SVG(element);
 
