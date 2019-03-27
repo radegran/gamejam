@@ -1,12 +1,12 @@
 import SVG from "svgjs";
 import { smooth } from "./util";
 
-export const updateChangeHeightDots = (editGroup:SVG.G, heights:Array<number>) => {
+export const updateHeightDots = (editGroup:SVG.G, heights:Array<number>) => {
+    let circles = editGroup.select(".dot");
     heights.forEach((h, index) => {
-        let e = editGroup.select("#ix-" + index).get(0);
+        let e = circles.get(index);
         if (!e) {
             e = editGroup.circle(0.1)
-            .id("ix-" + index)
             .addClass("dot")
             .translate(index, h)
             .fill("red");

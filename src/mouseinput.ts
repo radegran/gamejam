@@ -9,6 +9,7 @@ interface DragOperationSettings {
 export function MouseInput(mainSvg:any) {
     const helperPoint = mainSvg.createSVGPoint();
     const s = SVG(mainSvg);
+    let internalMouseDownCallback:any;
 
     const event2domPoint = (e:MouseEvent) : Point => ({x:e.pageX, y:e.pageY});
 
@@ -33,10 +34,15 @@ export function MouseInput(mainSvg:any) {
     };
 
     const onMouseDown = (callback:PointCallback) => {
-        s.on("mousedown", (e:MouseEvent) => {
+        if (!!internalMouseDownCallback) {
+            throw "double trouble callback. (Registered twice)";
+        }
+
+        internalMouseDownCallback = (e:MouseEvent) => {
             let svgPoint = domPoint2svgPoint(event2domPoint(e));
             callback(svgPoint);
-        });
+        };
+        s.on("mousedown", internalMouseDownCallback);
     };
 
     const startDragOperation = (settings:DragOperationSettings) => {
@@ -57,7 +63,8 @@ export function MouseInput(mainSvg:any) {
     };
 
     const off = () => {
-        throw "TODO"
+        s.off("mousedown", internalMouseDownCallback);
+        internalMouseDownCallback = null;
     };
 
     return {

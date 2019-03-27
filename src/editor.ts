@@ -1,5 +1,5 @@
 import SVG from "svgjs";
-import { updateChangeHeightDots, drawHeightPath } from "./editor-graphics";
+import { updateHeightDots, drawHeightPath } from "./editor-graphics";
 import { isCloseToPath } from "./util";
 import { Point } from "./defs";
 import { createViewPort, ViewPort } from "./viewport";
@@ -20,45 +20,52 @@ export const Editor = (heightMap:Array<number>) => {
 
     let mouseInput = MouseInput(mainSvg);
 
+    const startChangeHeights = (pDown:Point) => {
+        let ixFrom = 0;
+        let ixTo = heightMap.length;
+        let heightMapCopy = [...heightMap];
+        let calcWeight = decayedWeight(viewPort.zoomLevel());
+
+        mouseInput.startDragOperation({
+            onMouseMove: (pMove:Point) => {
+                let yDiff = pMove.y - pDown.y;
+                for (let ix = ixFrom; ix < ixTo; ix++) {
+                    let w = calcWeight(ix - pDown.x);
+                    heightMap[ix] = heightMapCopy[ix] + yDiff*w;
+                }
+                updateHeightDots(editGroup, heightMap);
+            },
+            onMouseUp: () => {
+                s.select(".dot").each((i, m) => m[i].remove());
+                drawHeightPath(editGroup, heightMap);
+            }
+        });
+    };
+
+    const startPanning = (pDown:Point) => {
+        let v = s.viewbox();
+        mouseInput.startDragOperation({
+            onMouseMove: (pMove:Point) => {
+                s.viewbox({
+                    x: v.x - (pMove.x - pDown.x),
+                    y: v.y - (pMove.y - pDown.y), 
+                    width: v.width, 
+                    height:v.height
+                });    
+            },
+            onMouseUp: () => {}
+        });
+    };
+
     const onMouseDown = (pDown:Point) => {
         let tolerance = 2*viewPort.zoomLevel();
         if (isCloseToPath(pDown, heightMap, tolerance))
         {
-            let pDownIx = Math.round(pDown.x);
-            let ixFrom = 0;
-            let ixTo = heightMap.length;
-            let heightMapCopy = [...heightMap];
-            let calcWeight = decayedWeight(viewPort.zoomLevel());
-
-            mouseInput.startDragOperation({
-                onMouseMove: (pMove:Point) => {
-                    let yDiff = pMove.y - pDown.y;
-                    for (let ix = ixFrom; ix < ixTo; ix++) {
-                        let w = calcWeight(ix - pDown.x);
-                        heightMap[ix] = heightMapCopy[ix] + yDiff*w;
-                    }
-                    updateChangeHeightDots(editGroup, heightMap);
-                },
-                onMouseUp: () => {
-                    s.select(".dot").each((i, m) => m[i].remove());
-                    drawHeightPath(editGroup, heightMap);
-                }
-            })
+           startChangeHeights(pDown); 
         }
         else 
         {
-            let v = s.viewbox();
-            mouseInput.startDragOperation({
-                onMouseMove: (pMove:Point) => {
-                    s.viewbox({
-                        x: v.x - (pMove.x - pDown.x),
-                        y: v.y - (pMove.y - pDown.y), 
-                        width: v.width, 
-                        height:v.height
-                    });    
-                },
-                onMouseUp: () => {}
-            })
+            startPanning(pDown);
         }
     };
 
