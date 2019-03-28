@@ -26,21 +26,29 @@ export const createViewPort = (mainSvgId:string) => {
         let v = s.viewbox();
         if (!!p) {
             s.viewbox({
-                x: p.x,
-                y: p.y, 
+                x: p.x - v.width/2,
+                y: p.y - v.height/2, 
                 width: v.width, 
                 height:v.height
             });    
         }
         else
         {
-            return v;
+            return {x:v.x + v.width/2, y:v.y + v.height/2};
         }
     }
 
+    const setGetZoomLevel = (level?:number) => {
+        if (level === undefined) {
+            return zoomLevel;
+        }
+        zoomLevel = level;
+        zoom(1);
+    };
+
     return {
         zoom,
-        zoomLevel: () => { return zoomLevel; },
+        zoomLevel: setGetZoomLevel,
         location
     };
 };

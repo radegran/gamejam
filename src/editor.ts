@@ -4,21 +4,25 @@ import { isCloseToPath } from "./util";
 import { Point } from "./defs";
 import { createViewPort, ViewPort } from "./viewport";
 import { MouseInput } from "./mouseinput";
+import { KeyboardInput } from "./keyboardinput";
 
 const decayedWeight = (zoomLevel:number) => (distFromFocus:number) => {
     let adjustedDist = distFromFocus / zoomLevel;
-    return Math.pow(1.01, -adjustedDist*adjustedDist);
+    return Math.pow(1.05, -adjustedDist*adjustedDist);
 };
 
-export const Editor = (heightMap:Array<number>) => {
+export const Editor = (gamedata:any) => {
 
+    let editorVisible = true;
+    let heightMap:Array<number> = gamedata.heightMap;
     let viewPort = createViewPort("mainsvg");
     let mainSvg:any = document.getElementById("mainsvg");
     let s = SVG(mainSvg);
     
-    let editGroup = s.group().id("editgroup").hide();
+    let editGroup = s.group().id("editgroup");
 
     let mouseInput = MouseInput(mainSvg);
+    let keyboardInput = KeyboardInput();
 
     const startChangeHeights = (pDown:Point) => {
         let ixFrom = 0;
@@ -56,7 +60,7 @@ export const Editor = (heightMap:Array<number>) => {
     };
 
     const onMouseDown = (pDown:Point) => {
-        let tolerance = 2*viewPort.zoomLevel();
+        let tolerance = viewPort.zoomLevel();
         if (isCloseToPath(pDown, heightMap, tolerance))
         {
            startChangeHeights(pDown); 
@@ -67,28 +71,38 @@ export const Editor = (heightMap:Array<number>) => {
         }
     };
 
-    window.addEventListener("keydown", (e:KeyboardEvent) => { 
-        if (e.keyCode == 107) {
-            viewPort.zoom(0.8);
-        }
-        else if (e.keyCode == 109) {
-            viewPort.zoom(1.25);
-        }
-    }, true);
-
     const show = () => {
         drawHeightPath(editGroup, heightMap);
         mouseInput.onMouseDown(onMouseDown);
-        editGroup.show();
+        keyboardInput.onKeyDown(107, () => viewPort.zoom(0.8));  // +
+        keyboardInput.onKeyDown(109, () => viewPort.zoom(1.25)); // -    
+        editorVisible = true;
+        //editGroup.show();
     };
 
     const hide = () => {
         mouseInput.off();
-        editGroup.hide();
+        keyboardInput.off();
+        editorVisible = false;
+        //editGroup.hide();
     };
 
+    const toggle = (visible?:boolean) => {
+        if (visible !== undefined) {
+            visible ? show() : hide();
+        }
+        else {
+            editorVisible ? hide() : show();
+        } 
+        return editorVisible;
+    };
+
+    const getHeightMap = () => {
+        return [...heightMap];
+    }
+
     return {
-        show,
-        hide
+        toggle,
+        getHeightMap
     };
 };
