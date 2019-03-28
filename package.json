@@ -3,9 +3,7 @@
     "name": "gamejam",
     "version": "0.0.1",
     "scripts": {
-        "start": "./node_modules/.bin/rollup -c && cp ./node_modules/svgjs/dist/svg.js dist/. && node server/main.ts",
-        "clear:all": "rm -rf node_modules/ npm-debug.log",
-        "test": "jasmine JASMINE_CONFIG_PATH=jasmine.json"
+        "start": "./node_modules/.bin/rollup -c && cp ./node_modules/svgjs/dist/svg.js dist/. && node server/main.ts"
     },
     "devDependencies": {
         "@types/jasmine": "^3.3.12",
