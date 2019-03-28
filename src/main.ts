@@ -99,7 +99,7 @@ const stepGame = (view:any) => (dt:number, gameData:GameData) => {
 
 function main() {
     
-    let gameData = createGameData(createHeightMap(100));
+    let gameData = createGameData(createHeightMap(1000));
 
     let editor = Editor(gameData);
 
@@ -115,7 +115,7 @@ function main() {
 
     let keyboardInput = KeyboardInput();
 
-    keyboardInput.onKeyDown(27, () => {   // ESC
+    keyboardInput.onKeyDown(32, () => {   // Space
         let editorVisible = editor.toggle();
         if (editorVisible) {
             gameLoop.stop();

@@ -1,19 +1,19 @@
 import SVG from "svgjs";
 import { smooth } from "./util";
 
-export const updateHeightDots = (editGroup:SVG.G, heights:Array<number>) => {
-    let circles = editGroup.select(".dot");
-    heights.forEach((h, index) => {
-        let e = circles.get(index);
-        if (!e) {
-            e = editGroup.circle(0.1)
-            .addClass("dot")
-            .translate(index, h)
-            .fill("red");
-        }
-        e.translate(index, h);
-    })
-};
+// export const updateHeightDots = (editGroup:SVG.G, heights:Array<number>) => {
+//     let circles = editGroup.select(".dot");
+//     heights.forEach((h, index) => {
+//         let e = circles.get(index);
+//         if (!e) {
+//             e = editGroup.circle(0.1)
+//             .addClass("dot")
+//             .translate(index, h)
+//             .fill("red");
+//         }
+//         e.translate(index, h);
+//     })
+// };
 
 export const drawHeightPath = (editGroup:SVG.G, heights:Array<number>) => {
     let path = editGroup.select(".heightPath").get(0);
