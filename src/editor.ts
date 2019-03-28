@@ -60,7 +60,7 @@ export const Editor = (gamedata:any) => {
     };
 
     const onMouseDown = (pDown:Point) => {
-        let tolerance = viewPort.zoomLevel();
+        let tolerance = viewPort.zoomLevel()/2;
         if (isCloseToPath(pDown, heightMap, tolerance))
         {
            startChangeHeights(pDown); 

@@ -21,6 +21,5 @@ export const isCloseToPath = (p:Point, heights:Array<number>, tolerance:number) 
     if (ix < -tolerance || ix > heights.length + tolerance) {
         return false;
     }
-    ix = Math.max(0, Math.min(heights.length-1, ix));
-    return Math.abs(heights[ix] - p.y) < 3;
+    return Math.abs(smooth(p.x, heights) - p.y) < tolerance;
 };
