@@ -1,4 +1,5 @@
 import SVG from "svgjs";
+import { Point } from "./defs";
 
 export type ViewPort = ReturnType<typeof createViewPort>;
 
@@ -21,8 +22,25 @@ export const createViewPort = (mainSvgId:string) => {
         });
     };
 
+    const location = (p?:Point) => {
+        let v = s.viewbox();
+        if (!!p) {
+            s.viewbox({
+                x: p.x,
+                y: p.y, 
+                width: v.width, 
+                height:v.height
+            });    
+        }
+        else
+        {
+            return v;
+        }
+    }
+
     return {
         zoom,
-        zoomLevel: () => { return zoomLevel; }
+        zoomLevel: () => { return zoomLevel; },
+        location
     };
 };

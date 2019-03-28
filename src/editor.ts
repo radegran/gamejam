@@ -43,15 +43,13 @@ export const Editor = (heightMap:Array<number>) => {
     };
 
     const startPanning = (pDown:Point) => {
-        let v = s.viewbox();
+        let location = viewPort.location();
         mouseInput.startDragOperation({
             onMouseMove: (pMove:Point) => {
-                s.viewbox({
-                    x: v.x - (pMove.x - pDown.x),
-                    y: v.y - (pMove.y - pDown.y), 
-                    width: v.width, 
-                    height:v.height
-                });    
+                viewPort.location({
+                    x:location.x - (pMove.x - pDown.x),
+                    y:location.y - (pMove.y - pDown.y)
+                });
             },
             onMouseUp: () => {}
         });
@@ -69,7 +67,6 @@ export const Editor = (heightMap:Array<number>) => {
         }
     };
 
-    
     window.addEventListener("keydown", (e:KeyboardEvent) => { 
         if (e.keyCode == 107) {
             viewPort.zoom(0.8);
