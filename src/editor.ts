@@ -1,5 +1,5 @@
 import SVG from "svgjs";
-import { drawHeightPath } from "./editor-graphics";
+import { drawHeightPath, drawHeightPaths } from "./editor-graphics";
 import { isCloseToPath } from "./util";
 import { Point } from "./defs";
 import { createViewPort, ViewPort } from "./viewport";
@@ -18,8 +18,6 @@ export const Editor = (gamedata:any) => {
     let viewPort = createViewPort("mainsvg");
     let mainSvg:any = document.getElementById("mainsvg");
     let s = SVG(mainSvg);
-    
-    let editGroup = s.group().id("editgroup");
 
     let mouseInput = MouseInput(mainSvg);
     let keyboardInput = KeyboardInput();
@@ -37,12 +35,12 @@ export const Editor = (gamedata:any) => {
                     let w = calcWeight(ix - pDown.x);
                     heightMap[ix] = heightMapCopy[ix] + yDiff*w;
                 }
-                drawHeightPath(editGroup, heightMap);
+                drawHeightPath(s, heightMap);
                 //updateHeightDots(editGroup, heightMap);
             },
             onMouseUp: () => {
                 s.select(".dot").each((i, m) => m[i].remove());
-                drawHeightPath(editGroup, heightMap);
+                drawHeightPaths(s, heightMap);
             }
         });
     };
@@ -77,7 +75,7 @@ export const Editor = (gamedata:any) => {
     };
 
     const show = () => {
-        drawHeightPath(editGroup, heightMap);
+        drawHeightPaths(s, heightMap);
         mouseInput.onMouseDown(onMouseDown);
         window.addEventListener("wheel", onWheel);    
         editorVisible = true;

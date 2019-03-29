@@ -2,3 +2,4 @@ node_modules
 dist/myLib.js
 .vscode
 ignore
+.rpt2_cache

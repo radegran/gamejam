@@ -15,7 +15,20 @@ import { smooth } from "./util";
 //     })
 // };
 
-export const drawHeightPath = (editGroup:SVG.G, heights:Array<number>) => {
+export const getEditGroup = (s:SVG.Doc, id:string, scale:number):SVG.G => {
+    let editGroup = s.select("#" + id).get(0) as SVG.G;
+    if (editGroup == null) {
+        editGroup = s.group().id(id);
+    }
+    return editGroup;
+};
+
+export const drawHeightPaths = (s:SVG.Doc, heights:Array<number>) => {
+    drawHeightPath(s, heights);
+};
+
+export const drawHeightPath = (s:SVG.Doc, heights:Array<number>) => {
+    let editGroup = getEditGroup(s, "player-layer", 1);
     let path = editGroup.select(".heightPath").get(0);
     if (path) {
         path.remove();
