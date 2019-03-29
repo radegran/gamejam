@@ -23,12 +23,21 @@ export const getEditGroup = (s:SVG.Doc, id:string, scale:number):SVG.G => {
     return editGroup;
 };
 
-export const drawHeightPaths = (s:SVG.Doc, heights:Array<number>) => {
-    drawHeightPath(s, heights);
+export const drawHeightPaths = (s:SVG.Doc, heights:Array<number>)=> {
+    let backgroundGroup = getEditGroup(s, "background-layer", 0.3).opacity(0.5);
+    let foregroundGroup = getEditGroup(s, "foreground-layer", 1.3).opacity(0.5);
+    drawHeightPath(backgroundGroup, heights);    
+    drawHeightPathPlayerLayer(s, heights);
+    drawHeightPath(foregroundGroup, heights);    
 };
 
-export const drawHeightPath = (s:SVG.Doc, heights:Array<number>) => {
+export const drawHeightPathPlayerLayer = (s:SVG.Doc, heights:Array<number>) => {
     let editGroup = getEditGroup(s, "player-layer", 1);
+    drawHeightPath(editGroup, heights);    
+};
+
+
+const drawHeightPath = (editGroup:SVG.G, heights:Array<number>) => {
     let path = editGroup.select(".heightPath").get(0);
     if (path) {
         path.remove();

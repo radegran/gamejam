@@ -1,5 +1,5 @@
 import SVG from "svgjs";
-import { drawHeightPath, drawHeightPaths } from "./editor-graphics";
+import { drawHeightPathPlayerLayer, drawHeightPaths } from "./editor-graphics";
 import { isCloseToPath } from "./util";
 import { Point } from "./defs";
 import { createViewPort, ViewPort } from "./viewport";
@@ -35,7 +35,7 @@ export const Editor = (gamedata:any) => {
                     let w = calcWeight(ix - pDown.x);
                     heightMap[ix] = heightMapCopy[ix] + yDiff*w;
                 }
-                drawHeightPath(s, heightMap);
+                drawHeightPathPlayerLayer(s, heightMap);
                 //updateHeightDots(editGroup, heightMap);
             },
             onMouseUp: () => {
