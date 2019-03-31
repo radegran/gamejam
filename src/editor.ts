@@ -1,7 +1,7 @@
 import SVG from "svgjs";
-import { drawHeightPathPlayerLayer, drawHeightPaths } from "./editor-graphics";
+import { PathDrawer } from "./editor-graphics";
 import { isCloseToPath } from "./util";
-import { Point } from "./defs";
+import { Point, LayerDefinition } from "./defs";
 import { createViewPort, ViewPort } from "./viewport";
 import { MouseInput } from "./mouseinput";
 import { KeyboardInput } from "./keyboardinput";
@@ -11,11 +11,10 @@ const decayedWeight = (zoomLevel:number) => (distFromFocus:number) => {
     return Math.pow(1.05, -adjustedDist*adjustedDist);
 };
 
-export const Editor = (gamedata:any) => {
+export const Editor = (gamedata:any, viewPort:ViewPort, pathDrawer:PathDrawer) => {
 
     let editorVisible = true;
     let heightMap:Array<number> = gamedata.heightMap;
-    let viewPort = createViewPort("mainsvg");
     let mainSvg:any = document.getElementById("mainsvg");
     let s = SVG(mainSvg);
 
@@ -35,12 +34,12 @@ export const Editor = (gamedata:any) => {
                     let w = calcWeight(ix - pDown.x);
                     heightMap[ix] = heightMapCopy[ix] + yDiff*w;
                 }
-                drawHeightPathPlayerLayer(s, heightMap);
+                pathDrawer.drawLayerWithScale(scale => scale === 1);
                 //updateHeightDots(editGroup, heightMap);
             },
             onMouseUp: () => {
                 s.select(".dot").each((i, m) => m[i].remove());
-                drawHeightPaths(s, heightMap);
+                pathDrawer.drawAllLayers();
             }
         });
     };
@@ -75,7 +74,7 @@ export const Editor = (gamedata:any) => {
     };
 
     const show = () => {
-        drawHeightPaths(s, heightMap);
+        pathDrawer.drawAllLayers();
         mouseInput.onMouseDown(onMouseDown);
         window.addEventListener("wheel", onWheel);    
         editorVisible = true;

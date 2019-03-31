@@ -1,5 +1,6 @@
 import SVG from "svgjs";
 import { smooth } from "./util";
+import { LayerDefinition } from "./defs";
 
 // export const updateHeightDots = (editGroup:SVG.G, heights:Array<number>) => {
 //     let circles = editGroup.select(".dot");
@@ -15,12 +16,30 @@ import { smooth } from "./util";
 //     })
 // };
 
-export const getEditGroup = (s:SVG.Doc, id:string, scale:number):SVG.G => {
-    let editGroup = s.select("#" + id).get(0) as SVG.G;
-    if (editGroup == null) {
-        editGroup = s.group().id(id);
-    }
-    return editGroup;
+export type PathDrawer = ReturnType<typeof createPathDrawer>;
+
+export const createPathDrawer = (s:SVG.Doc, heights:Array<number>, layers:Array<LayerDefinition>) => {
+
+    layers.sort((a, b) => a.scale - b.scale);
+
+    const drawAllLayers = () => {
+        drawLayerWithScale((_) => true);
+    };
+
+
+    const drawLayerWithScale = (predicate:(scale:number) => boolean) => {
+        layers.forEach(def => {
+            if (predicate(def.scale)) {
+                let group = getEditGroup(s, def.id, def.scale);
+                drawHeightPath(group, heights);
+            }
+        });
+    };
+
+    return {
+        drawAllLayers,
+        drawLayerWithScale
+    };
 };
 
 export const drawHeightPaths = (s:SVG.Doc, heights:Array<number>)=> {
@@ -36,6 +55,13 @@ export const drawHeightPathPlayerLayer = (s:SVG.Doc, heights:Array<number>) => {
     drawHeightPath(editGroup, heights);    
 };
 
+const getEditGroup = (s:SVG.Doc, id:string, scale:number):SVG.G => {
+    let editGroup = s.select("#" + id).get(0) as SVG.G;
+    if (editGroup == null) {
+        editGroup = s.group().id(id);
+    }
+    return editGroup;
+};
 
 const drawHeightPath = (editGroup:SVG.G, heights:Array<number>) => {
     let path = editGroup.select(".heightPath").get(0);

@@ -2,10 +2,11 @@ import {Foo} from "./foo";
 import { Editor } from "./editor";
 import { KeyboardInput } from "./keyboardinput";
 import { GameLoop } from "./gameloop";
-import { GameData } from "./defs";
+import { GameData, LayerDefinition } from "./defs";
 import { createViewPort, ViewPort } from "./viewport";
 import SVG from "svgjs";
 import { smooth } from "./util";
+import { createPathDrawer } from "./editor-graphics";
 
 const createHeightMap = (size:number) => {
     let heightMap = new Array(size);
@@ -97,17 +98,30 @@ const stepGame = (view:any) => (dt:number, gameData:GameData) => {
     view.update(dt, gameData);
 };
 
+const createLayerDefinition = (id:string, scale:number):LayerDefinition => ({
+    id,
+    scale
+});
+
 function main() {
     
-    let gameData = createGameData(createHeightMap(1000));
-
-    let editor = Editor(gameData);
+    let heightMap = createHeightMap(100);
+    let gameData = createGameData(heightMap);
 
     let svgId = "mainsvg";
+    let s = SVG(document.getElementById(svgId));
+
+    let layers:Array<LayerDefinition> = [
+        createLayerDefinition("background-layer", 0.3),
+        createLayerDefinition("player-layer", 1),
+        createLayerDefinition("foreground-layer", 1.2)
+    ];
+
+    let pathDrawer = createPathDrawer(s, heightMap, layers)
 
     let viewPort = createViewPort(svgId);
-    
-    let s = SVG(document.getElementById(svgId));
+
+    let editor = Editor(gameData, viewPort, pathDrawer);    
 
     let view = View(viewPort, s);
 

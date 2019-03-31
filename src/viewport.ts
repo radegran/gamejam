@@ -7,6 +7,12 @@ export const createViewPort = (mainSvgId:string) => {
     let element:HTMLElement = document.getElementById(mainSvgId);
     let s = SVG(element);
 
+    s.viewbox({
+        x:-5,
+        y:-10,
+        width:20,
+        height:20
+    });
     let zoomLevel = 1;
 
     const zoom = (factor:number) => {

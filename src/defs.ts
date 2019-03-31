@@ -15,3 +15,8 @@ export interface GameData {
         angle: number
     }
 }
+
+export interface LayerDefinition {
+    id: string,
+    scale: number
+}
