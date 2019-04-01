@@ -30,10 +30,7 @@ export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDraw
         mouseInput.startDragOperation({
             onMouseMove: (pMove:Point) => {
                 let yDiff = pMove.y - pDown.y;
-                for (let ix = ixFrom; ix < ixTo; ix++) {
-                    let w = calcWeight(ix - pDown.x);
-                    heightMap.set(ix, heightMapCopy.get(ix) + yDiff*w);
-                }
+                heightMap.setAll((ix:number) => heightMapCopy.get(ix) + yDiff * calcWeight(ix - pDown.x));
                 pathDrawer.drawLayerWithScale(scale => scale === 1);
                 //updateHeightDots(editGroup, heightMap);
             },
@@ -61,9 +58,9 @@ export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDraw
         let tolerance = viewPort.zoomLevel()/2;
         if (isCloseToPath(pDown, heightMap, tolerance))
         {
-           startChangeHeights(pDown); 
+           startChangeHeights(pDown);
         }
-        else 
+        else
         {
             startPanning(pDown);
         }
@@ -76,7 +73,7 @@ export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDraw
     const show = () => {
         pathDrawer.drawAllLayers();
         mouseInput.onMouseDown(onMouseDown);
-        window.addEventListener("wheel", onWheel);    
+        window.addEventListener("wheel", onWheel);
         editorVisible = true;
         //editGroup.show();
     };
@@ -95,7 +92,7 @@ export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDraw
         }
         else {
             editorVisible ? hide() : show();
-        } 
+        }
         return editorVisible;
     };
 

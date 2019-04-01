@@ -19,22 +19,22 @@ const createHeightMap = (size:number) : HeightMap => {
         return heightMap[ix];
     };
 
-    const set = (index:number, value:number) => {
-        heightMap[index] = value;
+    const setAll = (valueFromIndex:(index:number) => number) => {
+        for (let i = 0; i < size; i++) {
+            heightMap[i] = valueFromIndex(i);
+        }
     };
 
     const length = () => heightMap.length;
 
     const clone = () => {
         let copy = createHeightMap(size);
-        for (let i = 0; i < size; i++) {
-            copy.set(i, get(i));
-        }
+        copy.setAll((i:number) => get(i));
         return copy;
     };
 
     return {
-        set,
+        setAll,
         get,
         count: length,
         clone

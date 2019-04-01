@@ -1,5 +1,9 @@
+interface NumCallback {
+    (index:number): number
+}
+
 export interface HeightMap {
-    set: (index:number, value:number) => void,
+    setAll: (callback:NumCallback) => void,
     get: (index:number) => number,
     count: () => number
     clone: () => HeightMap
