@@ -1,3 +1,10 @@
+export interface HeightMap {
+    set: (index:number, value:number) => void,
+    get: (index:number) => number,
+    count: () => number
+    clone: () => HeightMap
+};
+
 export interface Point {
     x:number,
     y:number
@@ -8,7 +15,7 @@ export interface PointCallback {
 }
 
 export interface GameData {
-    heightMap: Array<number>,
+    heightMap: HeightMap,
     player: {
         pos: Point,
         vel: Point,

@@ -1,7 +1,7 @@
 import SVG from "svgjs";
 import { PathDrawer } from "./editor-graphics";
 import { isCloseToPath } from "./util";
-import { Point, LayerDefinition } from "./defs";
+import { Point, LayerDefinition, GameData } from "./defs";
 import { createViewPort, ViewPort } from "./viewport";
 import { MouseInput } from "./mouseinput";
 import { KeyboardInput } from "./keyboardinput";
@@ -11,11 +11,11 @@ const decayedWeight = (zoomLevel:number) => (distFromFocus:number) => {
     return Math.pow(1.05, -adjustedDist*adjustedDist);
 };
 
-export const Editor = (gamedata:any, viewPort:ViewPort, pathDrawer:PathDrawer) => {
+export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDrawer) => {
 
     let editorVisible = true;
-    let heightMap:Array<number> = gamedata.heightMap;
-    let mainSvg:any = document.getElementById("mainsvg");
+    let heightMap = gamedata.heightMap;
+    let mainSvg:HTMLElement = document.getElementById("mainsvg");
     let s = SVG(mainSvg);
 
     let mouseInput = MouseInput(mainSvg);
@@ -23,8 +23,8 @@ export const Editor = (gamedata:any, viewPort:ViewPort, pathDrawer:PathDrawer) =
 
     const startChangeHeights = (pDown:Point) => {
         let ixFrom = 0;
-        let ixTo = heightMap.length;
-        let heightMapCopy = [...heightMap];
+        let ixTo = heightMap.count();
+        let heightMapCopy = heightMap.clone();
         let calcWeight = decayedWeight(viewPort.zoomLevel());
 
         mouseInput.startDragOperation({
@@ -32,7 +32,7 @@ export const Editor = (gamedata:any, viewPort:ViewPort, pathDrawer:PathDrawer) =
                 let yDiff = pMove.y - pDown.y;
                 for (let ix = ixFrom; ix < ixTo; ix++) {
                     let w = calcWeight(ix - pDown.x);
-                    heightMap[ix] = heightMapCopy[ix] + yDiff*w;
+                    heightMap.set(ix, heightMapCopy.get(ix) + yDiff*w);
                 }
                 pathDrawer.drawLayerWithScale(scale => scale === 1);
                 //updateHeightDots(editGroup, heightMap);
@@ -100,7 +100,7 @@ export const Editor = (gamedata:any, viewPort:ViewPort, pathDrawer:PathDrawer) =
     };
 
     const getHeightMap = () => {
-        return [...heightMap];
+        return heightMap.clone();
     }
 
     return {

@@ -2,21 +2,46 @@ import {Foo} from "./foo";
 import { Editor } from "./editor";
 import { KeyboardInput } from "./keyboardinput";
 import { GameLoop } from "./gameloop";
-import { GameData, LayerDefinition } from "./defs";
+import { GameData, LayerDefinition, HeightMap } from "./defs";
 import { createViewPort, ViewPort } from "./viewport";
 import SVG from "svgjs";
 import { smooth } from "./util";
 import { createPathDrawer } from "./editor-graphics";
 
-const createHeightMap = (size:number) => {
+const createHeightMap = (size:number) : HeightMap => {
     let heightMap = new Array(size);
     for (let i = 0; i < size; i++) {
         heightMap[i] = 0;
     }
-    return heightMap;
+
+    const get = (index:number) => {
+        let ix = Math.max(0, Math.min(heightMap.length-1, index));
+        return heightMap[ix];
+    };
+
+    const set = (index:number, value:number) => {
+        heightMap[index] = value;
+    };
+
+    const length = () => heightMap.length;
+
+    const clone = () => {
+        let copy = createHeightMap(size);
+        for (let i = 0; i < size; i++) {
+            copy.set(i, get(i));
+        }
+        return copy;
+    };
+
+    return {
+        set,
+        get,
+        count: length,
+        clone
+    };
 }
 
-const createGameData = (heightMap:Array<number>):GameData => {
+const createGameData = (heightMap:HeightMap):GameData => {
     return {
         heightMap,
         player: {
@@ -119,7 +144,7 @@ function main() {
 
     let pathDrawer = createPathDrawer(s, heightMap, layers)
 
-    let viewPort = createViewPort(svgId);
+    let viewPort = createViewPort(svgId, layers, heightMap);
 
     let editor = Editor(gameData, viewPort, pathDrawer);    
 
