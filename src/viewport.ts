@@ -34,7 +34,7 @@ export const createViewPort = (mainSvgId:string, layers:Array<LayerDefinition>, 
 
         layers.forEach(layer => {
             let layerSvg = s.select("#" + layer.id).get(0);
-            layerSvg.style("transform-origin", (p.x - layerBounds.width/2) + "px " + (p.y - layerBounds.height/2) + "px");
+            layerSvg.style("transform-origin", (p.x - layerBounds.width/2) + "px " + (p.y) + "px");
             layerSvg.scale(layer.scale);
         });
     };
