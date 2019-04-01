@@ -22,8 +22,6 @@ export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDraw
     let keyboardInput = KeyboardInput();
 
     const startChangeHeights = (pDown:Point) => {
-        let ixFrom = 0;
-        let ixTo = heightMap.count();
         let heightMapCopy = heightMap.clone();
         let calcWeight = decayedWeight(viewPort.zoomLevel());
 
@@ -31,7 +29,8 @@ export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDraw
             onMouseMove: (pMove:Point) => {
                 let yDiff = pMove.y - pDown.y;
                 heightMap.setAll((ix:number) => heightMapCopy.get(ix) + yDiff * calcWeight(ix - pDown.x));
-                pathDrawer.drawLayerWithScale(scale => scale === 1);
+                pathDrawer.drawAllLayers();
+                viewPort.adjustLayerPerspectives(viewPort.location());
                 //updateHeightDots(editGroup, heightMap);
             },
             onMouseUp: () => {

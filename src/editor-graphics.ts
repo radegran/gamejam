@@ -30,7 +30,7 @@ export const createPathDrawer = (s:SVG.Doc, heights:HeightMap, layers:Array<Laye
 const getEditGroup = (s:SVG.Doc, id:string, scale:number):SVG.G => {
     let editGroup = s.select("#" + id).get(0) as SVG.G;
     if (editGroup == null) {
-        editGroup = s.group().id(id).opacity(1 - Math.max(0, Math.min(1, 1-scale)));
+        editGroup = s.group().id(id).opacity(scale === 1 ? 1 : 0.3);
     }
     return editGroup;
 };

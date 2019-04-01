@@ -6,7 +6,8 @@ export interface HeightMap {
     setAll: (callback:NumCallback) => void,
     get: (index:number) => number,
     count: () => number
-    clone: () => HeightMap
+    clone: () => HeightMap,
+    bounds: () => {x:number, y:number, width:number, height:number}
 };
 
 export interface Point {

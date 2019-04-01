@@ -7,39 +7,7 @@ import { createViewPort, ViewPort } from "./viewport";
 import SVG from "svgjs";
 import { smooth } from "./util";
 import { createPathDrawer } from "./editor-graphics";
-
-const createHeightMap = (size:number) : HeightMap => {
-    let heightMap = new Array(size);
-    for (let i = 0; i < size; i++) {
-        heightMap[i] = 0;
-    }
-
-    const get = (index:number) => {
-        let ix = Math.max(0, Math.min(heightMap.length-1, index));
-        return heightMap[ix];
-    };
-
-    const setAll = (valueFromIndex:(index:number) => number) => {
-        for (let i = 0; i < size; i++) {
-            heightMap[i] = valueFromIndex(i);
-        }
-    };
-
-    const length = () => heightMap.length;
-
-    const clone = () => {
-        let copy = createHeightMap(size);
-        copy.setAll((i:number) => get(i));
-        return copy;
-    };
-
-    return {
-        setAll,
-        get,
-        count: length,
-        clone
-    };
-}
+import { createHeightMap } from "./heightmap";
 
 const createGameData = (heightMap:HeightMap):GameData => {
     return {
@@ -130,7 +98,7 @@ const createLayerDefinition = (id:string, scale:number):LayerDefinition => ({
 
 function main() {
     
-    let heightMap = createHeightMap(100);
+    let heightMap = createHeightMap(500);
     let gameData = createGameData(heightMap);
 
     let svgId = "mainsvg";
@@ -163,7 +131,7 @@ function main() {
         else {
             view.setup();
             gameData.player.pos.y = smooth(gameData.player.pos.x, gameData.heightMap);
-            gameLoop.start(createGameData(editor.getHeightMap()));
+            gameLoop.start(createGameData(heightMap));
         }
     });
 
