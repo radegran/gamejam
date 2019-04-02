@@ -58,13 +58,15 @@ const stepState = (dt:number, gameData:GameData) => {
     
 };
 
-const View = (viewPort:ViewPort, s:SVG.Doc) => {
+type View = ReturnType<typeof createView>;
+
+const createView = (viewPort:ViewPort, s:SVG.Doc) => {
     
     const playerWidth = 1;
     const playerHeight = 1.5;
     let playerSvg:SVG.Element;
 
-    const update = (dt:number, gameData:GameData) => {
+    const update = (gameData:GameData) => {
         let playerPos = gameData.player.pos;
         viewPort.location(playerPos);
         playerSvg.translate(playerPos.x - playerWidth/2, playerPos.y - playerHeight);
@@ -84,11 +86,6 @@ const View = (viewPort:ViewPort, s:SVG.Doc) => {
         setup,
         teardown
     };
-};
-
-const stepGame = (view:any) => (dt:number, gameData:GameData) => {
-    stepState(dt, gameData);
-    view.update(dt, gameData);
 };
 
 const createLayerDefinition = (id:string, scale:number):LayerDefinition => ({
@@ -116,9 +113,9 @@ function main() {
 
     let editor = Editor(gameData, viewPort, pathDrawer);    
 
-    let view = View(viewPort, s);
+    let view = createView(viewPort, s);
 
-    let gameLoop = GameLoop(stepGame(view));
+    let gameLoop = GameLoop(stepState, view.update);
 
     let keyboardInput = KeyboardInput();
 

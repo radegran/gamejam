@@ -1,18 +1,22 @@
 import { KeyboardInput } from "./keyboardinput";
 import { GameData } from "./defs";
 
-export const GameLoop = (updateGame:(dt:number, gameData:GameData)=>void) => {
+export const GameLoop = (updateGameState:(dt:number, gameData:GameData)=>void ,updateGameView:(gameData:GameData)=>void) => {
 
-    let keyboard = KeyboardInput();
-    let animationFrameTimeout:any = null;
-    let previousTime:number = 0;
+    const keyboard = KeyboardInput();
+    const TIME_STEP = 5; 
     let gameData:GameData;
+    let animationFrameTimeout:any = null;
+    let previousTime:number = -1;
 
     const onFrame = () => {
         let now = Date.now();
-        let dt = now - previousTime;
-        previousTime = now;
-        updateGame(dt, gameData);
+        while (previousTime + TIME_STEP < now) {
+            previousTime += TIME_STEP;
+            updateGameState(TIME_STEP, gameData);
+        }
+
+        updateGameView(gameData);
         animationFrameTimeout = window.requestAnimationFrame(onFrame);
     };
 
