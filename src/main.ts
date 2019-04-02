@@ -8,6 +8,7 @@ import SVG from "svgjs";
 import { smooth } from "./util";
 import { createPathDrawer } from "./editor-graphics";
 import { createHeightMap } from "./heightmap";
+import { stepState } from "./physics";
 
 const createGameData = (heightMap:HeightMap):GameData => {
     return {
@@ -19,46 +20,6 @@ const createGameData = (heightMap:HeightMap):GameData => {
         }    
     };
 };
-
-const magnitude = (x:number, y:number) => {
-    return Math.sqrt(x*x + y*y);
-}
-
-const stepState = (dt:number, gameData:GameData) => {
-    let pos = gameData.player.pos;
-    let vel = gameData.player.vel;
-
-    const gravity = 10;
-    vel.y += dt/1000 * gravity;
-
-    pos.x += vel.x*dt/1000;
-    pos.y += vel.y*dt/1000;
-
-    let throughGround =  pos.y - smooth(pos.x, gameData.heightMap);
-    if (throughGround > 0) {
-        pos.y -= throughGround;
-        let delta = 1;
-        let slope = (smooth(pos.x + delta/2, gameData.heightMap) - smooth(pos.x - delta/2, gameData.heightMap))/delta;
-        let absVel = magnitude(vel.x, vel.y);
-        let absDir = magnitude(delta, slope);
-
-        let groundNormal = {x:slope/absDir, y:-delta/absDir};
-        let groundUnit = {x:delta/absDir, y:slope/absDir};
-        let velUnit = {x:vel.x/absVel, y:vel.y/absVel};
-        
-        let velDotGroundNormal = groundNormal.x*velUnit.x + groundNormal.y*velUnit.y;
-        let velDotGroundUnit = groundUnit.x*velUnit.x + groundUnit.y*velUnit.y;
-        let movingTowardsGround = velDotGroundNormal < 0;
-
-        if (movingTowardsGround) {
-            vel.x = absVel*delta/absDir * velDotGroundUnit;
-            vel.y = absVel*slope/absDir * velDotGroundUnit;
-        }
-    }
-    
-};
-
-type View = ReturnType<typeof createView>;
 
 const createView = (viewPort:ViewPort, s:SVG.Doc) => {
     
@@ -102,21 +63,22 @@ function main() {
     let s = SVG(document.getElementById(svgId));
 
     let layers:Array<LayerDefinition> = [
-        createLayerDefinition("background-layer", 0.3),
+        createLayerDefinition("background-layer", 0.5),
         createLayerDefinition("player-layer", 1),
         createLayerDefinition("foreground-layer", 1.2)
     ];
 
-    let pathDrawer = createPathDrawer(s, heightMap, layers)
-
     let viewPort = createViewPort(svgId, layers, heightMap);
-
+    
+    // Editor
+    let pathDrawer = createPathDrawer(s, heightMap, layers)
     let editor = Editor(gameData, viewPort, pathDrawer);    
 
+    // Game
     let view = createView(viewPort, s);
-
     let gameLoop = GameLoop(stepState, view.update);
 
+    // Toggle Game/Editor
     let keyboardInput = KeyboardInput();
 
     keyboardInput.onKeyDown(32, () => {   // Space
