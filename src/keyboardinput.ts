@@ -17,6 +17,17 @@ export function KeyboardInput() {
         add("keydown", handler);
     };
 
+    const onKeyUp = (keyCode:number, callback:()=>void) => {
+
+        let handler = (e:KeyboardEvent) => {
+            if (e.keyCode === keyCode) {
+                callback();
+            }
+        };
+
+        add("keyup", handler);
+    };
+
     const add = (eventName:string, handler:any) => {
         addedHandlers.push([eventName, handler]);
         window.addEventListener(eventName, handler);
@@ -32,6 +43,7 @@ export function KeyboardInput() {
 
     return {
         onKeyDown,
+        onKeyUp,
         off
     };
 };
