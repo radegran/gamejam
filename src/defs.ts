@@ -29,13 +29,15 @@ export interface GameData {
         pos: Point,
         vel: Point,
         angle: number,
-        angleVel: number
+        angleVel: number,
+        touchesGround: boolean;
     },
     input: {
         rotateRight: boolean,
         rotateLeft: boolean,
         jump: boolean
     }
+    camFocus: Point
 }
 
 export interface LayerDefinition {

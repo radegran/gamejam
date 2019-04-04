@@ -16,38 +16,43 @@ const createGameData = (heightMap:HeightMap):GameData => {
             pos: {x:5, y:0},
             vel: {x:0, y:0},
             angle: 0,
-            angleVel: 0
+            angleVel: 0,
+            touchesGround: false
         },
         input: {
             rotateLeft: false,
             rotateRight: false,
             jump: false
-        }
+        },
+        camFocus: {x:0, y:0}
     };
 };
 
 const createView = (viewPort:ViewPort, s:SVG.Doc) => {
     
+    let playerSvgGroup:SVG.G;
     let playerSvg:SVG.Element;
 
     const update = (gameData:GameData) => {
         let playerPos = gameData.player.pos;
-        viewPort.location(playerPos);
-        playerSvg.rotate(180 * -gameData.player.angle / Math.PI);
-        playerSvg.translate(playerPos.x, playerPos.y);
+        viewPort.location(gameData.camFocus);
+        playerSvgGroup.rotate(180 * -gameData.player.angle / Math.PI);
+        playerSvgGroup.translate(playerPos.x, playerPos.y);
+        playerSvg.fill(gameData.player.touchesGround ? "red" : "salmon");
     };
 
     const setup = () => {
-        playerSvg = s.group().add(
-            s.rect(PLAYER_WIDTH, PLAYER_HEIGHT).move(-PLAYER_WIDTH/2, -PLAYER_HEIGHT/2)
-            .fill("red")
-        );
+        playerSvg = s
+            .rect(PLAYER_WIDTH, PLAYER_HEIGHT)
+            .move(-PLAYER_WIDTH/2, -PLAYER_HEIGHT)
+            .fill("red");
+        playerSvgGroup = s.group().add(playerSvg);
         
         viewPort.zoomLevel(1);
     };
 
     const teardown = () => {
-        playerSvg.remove();
+        playerSvgGroup.remove();
     };
     
     return {
