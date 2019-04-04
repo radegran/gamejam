@@ -3,7 +3,6 @@ import { KeyboardInput } from "./keyboardinput";
 import { GameLoop } from "./gameloop";
 import { GameData, LayerDefinition, HeightMap, PLAYER_WIDTH, PLAYER_HEIGHT } from "./defs";
 import { createViewPort, ViewPort } from "./viewport";
-import { smooth } from "./util";
 import { createPathDrawer } from "./editor-graphics";
 import { createHeightMap } from "./heightmap";
 import { stepState } from "./physics";
@@ -102,7 +101,7 @@ function main() {
         else {
             view.setup();
             let gameData = createGameData(heightMap);
-            gameData.player.pos.y = smooth(gameData.player.pos.x, gameData.heightMap);
+            gameData.player.pos.y = gameData.heightMap.get(gameData.player.pos.x);
             temporaryKeyboardInput.onKeyDown(39, () => { gameData.input.rotateRight = true; });
             temporaryKeyboardInput.onKeyUp(39, () => { gameData.input.rotateRight = false; });
             temporaryKeyboardInput.onKeyDown(37, () => { gameData.input.rotateLeft = true; });

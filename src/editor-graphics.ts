@@ -1,5 +1,4 @@
 import SVG from "svgjs";
-import { smooth } from "./util";
 import { LayerDefinition, HeightMap } from "./defs";
 
 export type PathDrawer = ReturnType<typeof createPathDrawer>;
@@ -41,7 +40,7 @@ const drawHeightPath = (editGroup:SVG.G, heights:HeightMap) => {
         path.remove();
     }
 
-    let multiplier = 10;
+    let multiplier = heights.smoothEnabled() ? 10 : 1;
     let detailedPath = new Array((heights.count()) * multiplier);
 
     let maxDepth = -10000;
@@ -49,15 +48,18 @@ const drawHeightPath = (editGroup:SVG.G, heights:HeightMap) => {
         let j = 0;
         while(j < multiplier) {
             let x = ix + j/multiplier;
-            let h = smooth(x, heights);
+            let h = heights.get(x);
             maxDepth = Math.max(maxDepth, h);
             detailedPath[multiplier*ix + j] = [x, h];
             j++;
         }
     }
 
-    detailedPath[0][1] = maxDepth;
-    detailedPath[detailedPath.length-1][1] = maxDepth;
+    // Close the path
+    detailedPath.push([detailedPath[detailedPath.length-1][0], maxDepth+1]);
+    detailedPath.push([detailedPath[0][0], maxDepth+1]);
+    detailedPath.push([detailedPath[0][0], detailedPath[0][1]]);
+
     editGroup.polyline(detailedPath)
         .addClass("heightPath")
         .fill("#ffaaaa")

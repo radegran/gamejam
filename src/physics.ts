@@ -1,5 +1,4 @@
 import { GameData, Point, GRAVITY, PLAYER_HEIGHT } from "./defs";
-import { smooth } from "./util";
 
 const vecToCenter = (player:GameData["player"]) => {
     return scale(p(-Math.sin(player.angle), -Math.cos(player.angle)), PLAYER_HEIGHT/2);
@@ -10,16 +9,17 @@ const getAngularAcceleration = (gameData:GameData) => {
         return 0;
     }
     if (gameData.input.rotateRight) {
-        return -1
+        return -1;
     }
     if (gameData.input.rotateLeft) {
-        return 1
+        return 1;
     }
     return -Math.sign(gameData.player.angleVel);
 };
 
 export const stepState = (dt:number, gameData:GameData) => {
     let player = gameData.player;
+    let heightMap = gameData.heightMap;
     
     let angleAcc = getAngularAcceleration(gameData);
     player.angleVel += 20*angleAcc * dt/1000;
@@ -41,10 +41,10 @@ export const stepState = (dt:number, gameData:GameData) => {
     pos.y += vel.y * dt/1000;
     
     let delta = 1;
-    let slope = (smooth(pos.x + delta/2, gameData.heightMap) - smooth(pos.x - delta/2, gameData.heightMap))/delta;
+    let slope = (heightMap.get(pos.x + delta/2) - heightMap.get(pos.x - delta/2))/delta;
     let groundNormal = p(slope, -delta);
         
-    const throughGround = pos.y - smooth(pos.x, gameData.heightMap);
+    const throughGround = pos.y - heightMap.get(pos.x);
     if (throughGround > -0.1 && gameData.input.jump) {
         player.vel = add(vel, scale(norm(groundNormal), 1));
     } 

@@ -22,9 +22,11 @@ export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDraw
     let keyboardInput = KeyboardInput();
 
     const startChangeHeights = (pDown:Point) => {
+        heightMap.smoothEnabled(false);
+
         let heightMapCopy = heightMap.clone();
         let calcWeight = decayedWeight(viewPort.zoomLevel());
-
+        
         mouseInput.startDragOperation({
             onMouseMove: (pMove:Point) => {
                 let yDiff = pMove.y - pDown.y;
@@ -35,6 +37,7 @@ export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDraw
             },
             onMouseUp: () => {
                 s.select(".dot").each((i, m) => m[i].remove());
+                heightMap.smoothEnabled(true);
                 pathDrawer.drawAllLayers();
             }
         });

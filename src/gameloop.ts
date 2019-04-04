@@ -4,7 +4,7 @@ import { GameData } from "./defs";
 export const GameLoop = (updateGameState:(dt:number, gameData:GameData)=>void ,updateGameView:(gameData:GameData)=>void) => {
 
     const keyboard = KeyboardInput();
-    const TIME_STEP = 5; 
+    const TIME_STEP = 10; 
     let gameData:GameData;
     let animationFrameTimeout:any = null;
     let previousTime:number = -1;
