@@ -53,13 +53,13 @@ export function MouseInput(mainSvg:any) {
         };
 
         const mouseUp = () => {
-            s.off("mousemove", mouseMove);
-            s.off("mouseup", mouseUp);
+            window.removeEventListener("mousemove", mouseMove, true);
+            window.removeEventListener("mouseup", mouseUp, true);
             settings.onMouseUp();
         };
 
-        s.on("mousemove", mouseMove);
-        s.on("mouseup", mouseUp);    
+        window.addEventListener("mousemove", mouseMove, true);
+        window.addEventListener("mouseup", mouseUp, true);    
     };
 
     const off = () => {

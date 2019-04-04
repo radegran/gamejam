@@ -62,6 +62,7 @@ export const stepState = (dt:number, gameData:GameData) => {
 
             // Tangentize angle
             player.angle = -Math.atan(slope/delta);
+            player.angleVel = 0;
         }
     }
 
