@@ -72,7 +72,7 @@ function main() {
     let s = SVG(document.getElementById(svgId));
 
     let layers:Array<LayerDefinition> = [
-        createLayerDefinition("background-layer", 0.5),
+        createLayerDefinition("background-layer", 0.3),
         createLayerDefinition("player-layer", 1),
         createLayerDefinition("foreground-layer", 1.2)
     ];

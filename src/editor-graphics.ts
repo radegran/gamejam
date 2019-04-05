@@ -15,7 +15,7 @@ export const createPathDrawer = (s:SVG.Doc, heights:HeightMap, layers:Array<Laye
         layers.forEach(def => {
             if (predicate(def.scale)) {
                 let group = getEditGroup(s, def.id, def.scale);
-                drawHeightPath(group, heights);
+                drawHeightPath(group, heights, def.scale);
             }
         });
     };
@@ -34,25 +34,22 @@ const getEditGroup = (s:SVG.Doc, id:string, scale:number):SVG.G => {
     return editGroup;
 };
 
-const drawHeightPath = (editGroup:SVG.G, heights:HeightMap) => {
+const drawHeightPath = (editGroup:SVG.G, heights:HeightMap, scale:number) => {
     let path = editGroup.select(".heightPath").get(0);
     if (path) {
         path.remove();
     }
 
-    let multiplier = heights.smoothEnabled() ? 5 : 1;
-    let detailedPath = new Array((heights.count()) * multiplier);
+    let multiplier = Math.min(scale, 1) * (heights.smoothEnabled() ? 5 : 1);
+    let points = heights.count() * multiplier;
+    let detailedPath = new Array(Math.ceil(points));
 
     let maxDepth = -10000;
-    for (let ix = 0; ix < heights.count(); ix++) {            
-        let j = 0;
-        while(j < multiplier) {
-            let x = ix + j/multiplier;
-            let h = heights.get(x);
-            maxDepth = Math.max(maxDepth, h);
-            detailedPath[multiplier*ix + j] = [x, h];
-            j++;
-        }
+    for (let ix = 0; ix < points; ix++) {            
+        let x = ix / multiplier;
+        let h = heights.get(x);
+        maxDepth = Math.max(maxDepth, h);
+        detailedPath[ix] = [x, h];
     }
 
     // Close the path
@@ -62,6 +59,5 @@ const drawHeightPath = (editGroup:SVG.G, heights:HeightMap) => {
 
     editGroup.polyline(detailedPath)
         .addClass("heightPath")
-        .fill("#ffaaaa")
-        .stroke({width:0.1, color: "red"});
+        .fill("#ffaaaa");
 };

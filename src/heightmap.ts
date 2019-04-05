@@ -14,6 +14,18 @@ export const createHeightMap = (size:number) : HeightMap => {
 
     const get = (x:number) => {
         x = Math.max(0, Math.min(heightMap.length-1, x));
+        if (smoothEnabled_) {
+            return getSmoothValue(x);
+        }
+        else {
+            let floor = Math.floor(x);
+            if (floor === x) {
+                return heightMap[x];
+            }
+            
+            let fraq = x - floor;
+            return (1-fraq)*heightMap[floor] + (fraq)*heightMap[floor+1];
+        }
         return smoothEnabled_ ? getSmoothValue(x) : heightMap[Math.round(x)];
     };
 
