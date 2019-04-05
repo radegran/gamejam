@@ -40,7 +40,7 @@ const drawHeightPath = (editGroup:SVG.G, heights:HeightMap) => {
         path.remove();
     }
 
-    let multiplier = heights.smoothEnabled() ? 10 : 1;
+    let multiplier = heights.smoothEnabled() ? 5 : 1;
     let detailedPath = new Array((heights.count()) * multiplier);
 
     let maxDepth = -10000;

@@ -66,7 +66,10 @@ export const stepState = (dt:number, gameData:GameData) => {
         }
     }
 
-    gameData.camFocus = add(pos, vecToCenter(player));
+    let playerCenter = add(pos, vecToCenter(player));
+
+    gameData.camFocus = add(scale(playerCenter, 1/30),
+                            scale(gameData.camFocus, 29/30));
     gameData.player.touchesGround = throughGround > -0.1;
 };
 
