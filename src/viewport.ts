@@ -1,5 +1,5 @@
 import SVG from "svgjs";
-import { Point, LayerDefinition, HeightMap } from "./defs";
+import { Point, LayerDefinition, HeightMap, VIEWPORT_WIDTH } from "./defs";
 
 export type ViewPort = ReturnType<typeof createViewPort>;
 
@@ -8,17 +8,17 @@ export const createViewPort = (mainSvgId:string, layers:Array<LayerDefinition>, 
     let s = SVG(element);
 
     s.viewbox({
-        x:-5,
-        y:-10,
-        width:20,
-        height:20
+        x: -VIEWPORT_WIDTH / 2,
+        y: -VIEWPORT_WIDTH / 2,
+        width: VIEWPORT_WIDTH,
+        height: VIEWPORT_WIDTH
     });
     let zoomLevel = 1;
 
     const zoom = (factor:number) => {
         let v = s.viewbox();
         zoomLevel *= factor;
-        let newWidth = zoomLevel * 20;
+        let newWidth = zoomLevel * VIEWPORT_WIDTH;
 
         s.viewbox({
             x:v.x + (v.width - newWidth)/2,
@@ -31,10 +31,11 @@ export const createViewPort = (mainSvgId:string, layers:Array<LayerDefinition>, 
     const adjustLayerPerspectives = (p:Point) => {
 
         let layerBounds = heightMap.bounds();
-
+        let forSweingPartitions = 1;
+        
         layers.forEach(layer => {
             let layerSvg = s.select("#" + layer.id).get(0);
-            layerSvg.style("transform-origin", (p.x - layerBounds.width/2) + "px " + (p.y) + "px");
+            layerSvg.style("transform-origin", (p.x - (layerBounds.width + forSweingPartitions)/2) + "px " + (p.y) + "px");
             layerSvg.scale(layer.scale);
         });
     };

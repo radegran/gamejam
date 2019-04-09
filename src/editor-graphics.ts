@@ -1,5 +1,5 @@
 import SVG from "svgjs";
-import { LayerDefinition, HeightMap } from "./defs";
+import { LayerDefinition, HeightMap, VIEWPORT_WIDTH } from "./defs";
 
 export type PathDrawer = ReturnType<typeof createPathDrawer>;
 
@@ -50,13 +50,13 @@ const drawHeightPath = (editGroup:SVG.G, heights:HeightMap, scale:number) => {
     let maxDepth = -10000;
     let points = heights.count() * multiplier;
     
-    let parts = heights.count() / 20;
+    let parts = heights.count() / VIEWPORT_WIDTH;
     let partList = [];
 
     for (let partIx = 0; partIx < parts; partIx++) {
 
         let startIx = Math.floor(points * partIx / parts);
-        let endIx = Math.floor(points * (partIx + 1) / parts);
+        let endIx = Math.min(Math.floor(points * (partIx + 1) / parts), points);
 
         let part = new Array(endIx - startIx);
         // "<=" constraint for overlapping parts

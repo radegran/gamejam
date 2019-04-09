@@ -57,7 +57,7 @@ export const createHeightMap = (size:number) : HeightMap => {
         return {
             x:0,
             y:minValue,
-            width: heightMap.length - 1,
+            width: heightMap.length,
             height:maxValue - minValue 
         };
     };

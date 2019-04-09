@@ -1,6 +1,7 @@
 export const PLAYER_WIDTH = 1;
 export const PLAYER_HEIGHT = 1.5;
 export const GRAVITY = 10;
+export const VIEWPORT_WIDTH = 40;
 
 interface NumCallback {
     (index:number): number
