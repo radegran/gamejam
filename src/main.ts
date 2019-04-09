@@ -96,7 +96,7 @@ function main() {
     let viewPort = createViewPort(svgId, layers, heightMap);
     
     // Editor
-    let pathDrawer = createPathDrawer(s, heightMap, layers)
+    let pathDrawer = createPathDrawer(s, heightMap, layers);
     let editor = Editor(createGameData(heightMap), viewPort, pathDrawer);    
 
     // Game

@@ -12,7 +12,8 @@ export interface HeightMap {
     count: () => number
     clone: () => HeightMap,
     bounds: () => {x:number, y:number, width:number, height:number},
-    smoothEnabled: (enable?:boolean) => void | boolean
+    smoothEnabled: (enable?:boolean) => void | boolean,
+    serialize: () => string
 };
 
 export interface Point {

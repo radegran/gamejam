@@ -20,9 +20,15 @@ export const createPathDrawer = (s:SVG.Doc, heights:HeightMap, layers:Array<Laye
         });
     };
 
+    const serialize = () => {
+        // @ts-ignore
+        return s.svg();
+    };
+
     return {
         drawAllLayers,
-        drawLayerWithScale
+        drawLayerWithScale,
+        serialize
     };
 };
 

@@ -69,12 +69,17 @@ export const createHeightMap = (size:number) : HeightMap => {
         smoothEnabled_ = enable;
     };
 
+    const serialize = () => {
+        return JSON.stringify(heightMap);
+    };
+
     return {
         setAll,
         get,
         count: length,
         clone,
         bounds,
-        smoothEnabled: smoothEnabled
+        smoothEnabled: smoothEnabled,
+        serialize
     };
 };

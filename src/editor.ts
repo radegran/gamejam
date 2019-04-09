@@ -11,6 +11,23 @@ const decayedWeight = (zoomLevel:number) => (distFromFocus:number) => {
     return Math.pow(1.05, -adjustedDist*adjustedDist);
 };
 
+
+const download = (filename:string, dataType:string, contents:string) => {
+    dataType = dataType || "text/plain;charset=utf-8";
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:' + dataType + ',' + encodeURIComponent(contents));
+    pom.setAttribute('download', filename);
+
+    if (document.createEvent) {
+        var event = document.createEvent('MouseEvents');
+        event.initEvent('click', true, true);
+        pom.dispatchEvent(event);
+    }
+    else {
+        pom.click();
+    }
+}
+
 export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDrawer) => {
 
     let editorVisible = true;
@@ -72,7 +89,17 @@ export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDraw
         viewPort.zoom(e.deltaY > 0 ? 1/1.1 : 1.1)
     };
 
+    const downloadHeightMap = () => {
+        download("level.json", "application/json", heightMap.serialize());
+    };
+
+    const downloadSvg = () => {
+        download("level.svg", "image/svg+xml", pathDrawer.serialize());
+    };
+
     const show = () => {
+        keyboardInput.onKeyDown(49, downloadHeightMap); // key "1"
+        keyboardInput.onKeyDown(50, downloadSvg); // key "2"
         pathDrawer.drawAllLayers();
         mouseInput.onMouseDown(onMouseDown);
         window.addEventListener("wheel", onWheel);
