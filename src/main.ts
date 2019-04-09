@@ -29,7 +29,7 @@ const createGameData = (heightMap:HeightMap):GameData => {
     };
 };
 
-const createView = (viewPort:ViewPort, s:SVG.Doc) => {
+const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefinition>) => {
     
     let playerSvgGroup:SVG.G;
     let playerSvg:SVG.Element;
@@ -53,8 +53,12 @@ const createView = (viewPort:ViewPort, s:SVG.Doc) => {
         viewPort.zoomLevel(1);
     };
 
-    const setup = (applyTransition_:(from:Point, to:Point)=>void) => {
-        applyTransition = applyTransition_;
+    const setup = () => {
+        reset();
+
+        // Performance: This is about not rendering svg elements that are not visible
+        let canvasWidth = s.node.getBoundingClientRect().width;
+        applyTransition = setupPartitions(canvasWidth, viewPort.width(), layers, s);
 
         playerSvg = s.rect(PLAYER_WIDTH, PLAYER_HEIGHT)
             .move(-PLAYER_WIDTH/2, -PLAYER_HEIGHT)
@@ -67,7 +71,6 @@ const createView = (viewPort:ViewPort, s:SVG.Doc) => {
     };
     
     return {
-        reset,
         update,
         setup,
         teardown
@@ -79,18 +82,70 @@ const createLayerDefinition = (id:string, scale:number):LayerDefinition => ({
     scale
 });
 
-function main() {
+async function loadLevelJson(levelName:string) {
+    let response = await fetch("levels/" + levelName + ".json");
+    let json = await response.json();
+    let heightMap = createHeightMap(json.length);
+    heightMap.setAll((i:number) => json[i]);
+    return heightMap;
+};
 
-    test();
-    
-    let svgId = "mainsvg";
-    let s = SVG(document.getElementById(svgId));
+const loadLevelSvg = async function(levelSvgName:string) {
+	let response = await fetch("levels/" + levelSvgName + ".svg");
+	let data = await response.text();
 
+    return data;
+	// This response should be an XML document we can parse.
+	// const parser = new DOMParser();
+    // const parsed = parser.parseFromString(data, 'image/svg+xml');
+    // return parsed;
+};
+
+function createLayers() {
     let layers:Array<LayerDefinition> = [
         createLayerDefinition("background-layer", 0.3),
         createLayerDefinition("player-layer", 1),
         createLayerDefinition("foreground-layer", 1.2)
     ];
+    return layers;
+}
+
+async function startGame() {
+
+    let svgString = await loadLevelSvg("level");
+    let svgId = "mainsvg";
+    let svgElement = document.getElementById(svgId);
+    svgElement.outerHTML = svgString;
+
+    let s = SVG(document.getElementById(svgId));
+
+    let heightMap = await loadLevelJson("level");
+    let gameData = createGameData(heightMap);
+
+    let layers = createLayers();
+    let viewPort = createViewPort(svgId, layers, heightMap);
+    
+    let view = createView(viewPort, s, layers);
+    let gameLoop = GameLoop(stepState, view.update);
+        
+    let keyboardinput = KeyboardInput();
+    gameData.player.pos.y = gameData.heightMap.get(gameData.player.pos.x);
+    keyboardinput.onKeyDown(39, () => { gameData.input.rotateRight = true; });
+    keyboardinput.onKeyUp(39, () => { gameData.input.rotateRight = false; });
+    keyboardinput.onKeyDown(37, () => { gameData.input.rotateLeft = true; });
+    keyboardinput.onKeyUp(37, () => { gameData.input.rotateLeft = false; });
+    keyboardinput.onKeyDown(38, () => { gameData.input.jump = true; });
+    keyboardinput.onKeyUp(38, () => { gameData.input.jump = false; });
+    
+    view.setup();
+    gameLoop.start(gameData);
+};
+
+const startEditMode = () => {
+    let svgId = "mainsvg";
+    let s = SVG(document.getElementById(svgId));
+
+    let layers = createLayers();
 
     let heightMap = createHeightMap(2500);
     let viewPort = createViewPort(svgId, layers, heightMap);
@@ -100,7 +155,7 @@ function main() {
     let editor = Editor(createGameData(heightMap), viewPort, pathDrawer);    
 
     // Game
-    let view = createView(viewPort, s);
+    let view = createView(viewPort, s, layers);
     let gameLoop = GameLoop(stepState, view.update);
 
     let temporaryKeyboardInput = KeyboardInput();
@@ -114,13 +169,7 @@ function main() {
             view.teardown();
         }
         else {
-            view.reset();
-
-            let canvasWidth = s.node.getBoundingClientRect().width;
-
-            // Performance: This is about not rendering svg elements that are not visible
-            let applyTransitions = setupPartitions(canvasWidth, viewPort.width(), layers, s);
-            view.setup(applyTransitions);
+            view.setup();
 
             let gameData = createGameData(heightMap);
             gameData.player.pos.y = gameData.heightMap.get(gameData.player.pos.x);
@@ -135,6 +184,20 @@ function main() {
     });
 
     editor.toggle(true);
+};
+
+function main() {
+
+    test();
+
+    if (window.location.href.search(/\?edit/) > -1) {
+        // ENTER EDIT MODE
+        startEditMode();
+    }
+    else {
+        // ENTER GAMING MODE
+        startGame();
+    }
 };
 
 main();
