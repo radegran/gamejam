@@ -6,9 +6,13 @@ export default {
     name: 'MyLib',
     file: 'dist/myLib.js',
     format: 'iife',
-    sourcemapExcludeSources: true
+    sourcemap: true
   }],
   plugins: [
-    typescript()
+    typescript({
+      tsconfigDefaults: {
+        sourcemap: true,
+      },
+    }),
   ]
 }

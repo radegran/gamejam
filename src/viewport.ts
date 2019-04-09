@@ -65,7 +65,12 @@ export const createViewPort = (mainSvgId:string, layers:Array<LayerDefinition>, 
         zoom(1);
     };
 
+    const width = () => {
+        return s.viewbox().width;
+    };
+
     return {
+        width,
         zoom,
         zoomLevel: setGetZoomLevel,
         location,

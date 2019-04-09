@@ -1,8 +1,31 @@
 body {
-    margin: 0
+    margin: 0;
+}
+
+.aligner {    
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
+  background-color: #eeeedd;
+  overflow: hidden;
+}
+
+.aspectRatio {
+    position: relative;
+    width: 100%;
+    padding-bottom: 60%;
+    height: 0;
+    background-color: white;
+}
+
+.aspectRatioChild {
+    position: absolute;
+    width: 100%;
+    height: 100%
 }
 
 #mainsvg {
     width: 100%;
-    height: 100%;
+    height: 100%
 }

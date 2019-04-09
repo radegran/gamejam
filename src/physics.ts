@@ -67,8 +67,10 @@ export const stepState = (dt:number, gameData:GameData) => {
     }
 
     let playerCenter = add(pos, vecToCenter(player));
+    let lookAheadOffset = 10 * Math.atan(vel.x / 10);
+    let playerCenterLookAhead = add(playerCenter, p(lookAheadOffset, 0));
 
-    gameData.camFocus = add(scale(playerCenter, 1/30),
+    gameData.camFocus = add(scale(playerCenterLookAhead, 1/30),
                             scale(gameData.camFocus, 29/30));
     gameData.player.touchesGround = throughGround > -0.1;
 };
