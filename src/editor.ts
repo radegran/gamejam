@@ -94,7 +94,15 @@ export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDraw
     };
 
     const downloadSvg = () => {
+        let currentZoomLevel = viewPort.zoomLevel();
+        let currentLocation = viewPort.location();
+        viewPort.resetLayerPerspectives();
+        
         download("level.svg", "image/svg+xml", pathDrawer.serialize());
+        
+        viewPort.zoomLevel(currentZoomLevel);
+        viewPort.location(currentLocation);
+        viewPort.adjustLayerPerspectives(currentLocation);        
     };
 
     const show = () => {

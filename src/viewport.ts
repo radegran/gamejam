@@ -40,6 +40,14 @@ export const createViewPort = (mainSvgId:string, layers:Array<LayerDefinition>, 
         });
     };
 
+    const resetLayerPerspectives = () => {
+        layers.forEach(layer => {
+            let layerSvg = s.select("#" + layer.id).get(0);
+            layerSvg.style("transform-origin", "");
+            layerSvg.scale(1);
+        });
+    };
+
     const location = (p?:Point) => {
         let v = s.viewbox();
         if (!!p) {
@@ -75,6 +83,7 @@ export const createViewPort = (mainSvgId:string, layers:Array<LayerDefinition>, 
         zoom,
         zoomLevel: setGetZoomLevel,
         location,
-        adjustLayerPerspectives
+        adjustLayerPerspectives,
+        resetLayerPerspectives
     };
 };
