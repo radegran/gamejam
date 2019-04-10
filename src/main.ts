@@ -110,16 +110,16 @@ function createLayers() {
     return layers;
 }
 
-async function startGame() {
+async function startGame(levelname:string) {
 
-    let svgString = await loadLevelSvg("level");
+    let svgString = await loadLevelSvg(levelname);
     let svgId = "mainsvg";
     let svgElement = document.getElementById(svgId);
     svgElement.outerHTML = svgString;
 
     let s = SVG(document.getElementById(svgId));
 
-    let heightMap = await loadLevelJson("level");
+    let heightMap = await loadLevelJson(levelname);
     let gameData = createGameData(heightMap);
 
     let layers = createLayers();
@@ -189,14 +189,19 @@ const startEditMode = () => {
 function main() {
 
     test();
+    let href = window.location.href;
 
-    if (window.location.href.search(/\?edit/) > -1) {
+    if (href.search(/\?edit/) > -1) {
         // ENTER EDIT MODE
         startEditMode();
     }
     else {
         // ENTER GAMING MODE
-        startGame();
+        let levelname = "level";
+        if (href.search(/\?level=/) > -1) {
+            levelname = href.split("?level=")[1];
+        }
+        startGame(levelname);
     }
 };
 
