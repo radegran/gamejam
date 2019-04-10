@@ -43,7 +43,7 @@ export const createViewPort = (mainSvgId:string, layers:Array<LayerDefinition>, 
     const resetLayerPerspectives = () => {
         layers.forEach(layer => {
             let layerSvg = s.select("#" + layer.id).get(0);
-            layerSvg.style("transform-origin", "");
+            layerSvg.style("transform-origin", "0 0");
             layerSvg.scale(1);
         });
     };

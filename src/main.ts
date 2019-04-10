@@ -49,8 +49,15 @@ const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefinition>)
     };
 
     const reset = () => {
-        viewPort.location({x:0, y:0});
+        layers.forEach(layer => {
+            let elem = s.select("#" + layer.id).get(0) as SVG.G;
+            if (!!elem) {
+                elem.translate(0, 0);
+            }
+        });
+
         viewPort.zoomLevel(1);
+        viewPort.location({x:0, y:0});
     };
 
     const setup = () => {
@@ -127,7 +134,7 @@ async function startGame(levelname:string) {
     
     let view = createView(viewPort, s, layers);
     let gameLoop = GameLoop(stepState, view.update);
-        
+    
     let keyboardinput = KeyboardInput();
     gameData.player.pos.y = gameData.heightMap.get(gameData.player.pos.x);
     keyboardinput.onKeyDown(39, () => { gameData.input.rotateRight = true; });
