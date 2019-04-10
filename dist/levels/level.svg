@@ -37,9 +37,9 @@
      inkscape:window-height="880"
      id="namedview786"
      showgrid="false"
-     inkscape:zoom="12.216246"
-     inkscape:cx="35.632205"
-     inkscape:cy="12.538368"
+     inkscape:zoom="8.6381904"
+     inkscape:cx="33.367928"
+     inkscape:cy="16.865497"
      inkscape:window-x="0"
      inkscape:window-y="9"
      inkscape:window-maximized="0"
@@ -48,9 +48,22 @@
      id="SvgjsDefs1001" />
   <g
      id="background-layer"
-     opacity="0.3"
      transform="matrix(1,0,0,1,0,1.8597274076193568)"
-     style="">
+     style=""
+     opacity="0.3">
+    <rect
+       style="fill:#00ffff;stroke-width:21.45034218"
+       id="rect5277"
+       width="1781.106"
+       height="193.13556"
+       x="-31.097017"
+       y="-35.381104" />
+    <circle
+       style="fill:#ffdd55"
+       id="path5280"
+       cx="7.7914996"
+       cy="-8.1316671"
+       r="1.4470624" />
     <g
        id="SvgjsG26156"
        class="heightPaths">
@@ -950,9 +963,9 @@
   </g>
   <g
      id="foreground-layer"
-     opacity="0.3"
      transform="matrix(1,0,0,1,0,-0.5313506878912446)"
-     style="">
+     style=""
+     opacity="0.3">
     <g
        id="SvgjsG26410"
        class="heightPaths">
@@ -1399,11 +1412,4 @@
       </g>
     </g>
   </g>
-  <rect
-     style="opacity:0.5;fill:#00ffff"
-     id="himmel"
-     width="66.059578"
-     height="26.685781"
-     x="2.2708044"
-     y="-13.466617" />
 </svg>
