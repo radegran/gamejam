@@ -42,7 +42,7 @@ const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefinition>)
 
         playerSvgGroup.rotate(180 * -gameData.player.angle / Math.PI);
         playerSvgGroup.translate(playerPos.x, playerPos.y);
-        playerSvg.fill(gameData.player.touchesGround ? "red" : "salmon");
+        playerSvgGroup.style("color", gameData.player.touchesGround ? "red" : "salmon");
         
         applyTransition(previousCamFocus, gameData.camFocus);
         previousCamFocus = gameData.camFocus;
@@ -60,17 +60,22 @@ const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefinition>)
         viewPort.location({x:0, y:0});
     };
 
-    const setup = () => {
+    const setup = async () => {
         reset();
 
         // Performance: This is about not rendering svg elements that are not visible
         let canvasWidth = s.node.getBoundingClientRect().width;
         applyTransition = setupPartitions(canvasWidth, viewPort.width(), layers, s);
 
-        playerSvg = s.rect(PLAYER_WIDTH, PLAYER_HEIGHT)
-            .move(-PLAYER_WIDTH/2, -PLAYER_HEIGHT)
-            .fill("red");
-        playerSvgGroup = s.group().add(playerSvg);
+        playerSvgGroup = s.group();
+        if (!playerSvg) {
+            let elem = (await loadSvg("player.svg")).asElement();
+            let elemText = elem.getElementsByTagName('g')[0].outerHTML;
+            playerSvgGroup.svg(elemText);
+            let bbox = playerSvgGroup.bbox();
+            playerSvgGroup.scale(1/bbox.height);
+        }
+
     };
 
     const teardown = () => {
@@ -90,22 +95,31 @@ const createLayerDefinition = (id:string, scale:number):LayerDefinition => ({
 });
 
 async function loadLevelJson(levelName:string) {
-    let response = await fetch("levels/" + levelName + ".json");
+    let response = await fetch(levelName);
     let json = await response.json();
     let heightMap = createHeightMap(json.length);
     heightMap.setAll((i:number) => json[i]);
     return heightMap;
 };
 
-const loadLevelSvg = async function(levelSvgName:string) {
-	let response = await fetch("levels/" + levelSvgName + ".svg");
-	let data = await response.text();
+const loadSvg = async function(svgUrl:string) {
+    let response = await fetch(svgUrl);
+    let text = await response.text();
+    
+    return {
+        asText,
+        asElement
+    };
 
-    return data;
-	// This response should be an XML document we can parse.
-	// const parser = new DOMParser();
-    // const parsed = parser.parseFromString(data, 'image/svg+xml');
-    // return parsed;
+    function asText() {
+        return text;
+    };
+
+    function asElement() {
+	    const parser = new DOMParser();
+        const parsed = parser.parseFromString(text, 'image/svg+xml');
+        return parsed;
+    };
 };
 
 function createLayers() {
@@ -119,14 +133,14 @@ function createLayers() {
 
 async function startGame(levelname:string) {
 
-    let svgString = await loadLevelSvg(levelname);
+    let svgString = (await loadSvg("levels/" + levelname + ".svg")).asText();
     let svgId = "mainsvg";
     let svgElement = document.getElementById(svgId);
     svgElement.outerHTML = svgString;
 
     let s = SVG(document.getElementById(svgId));
 
-    let heightMap = await loadLevelJson(levelname);
+    let heightMap = await loadLevelJson("levels/" + levelname + ".json");
     let gameData = createGameData(heightMap);
 
     let layers = createLayers();
