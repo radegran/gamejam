@@ -73,7 +73,7 @@ const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefinition>)
             let elemText = elem.getElementsByTagName('g')[0].outerHTML;
             playerSvgGroup.svg(elemText);
             let bbox = playerSvgGroup.bbox();
-            playerSvgGroup.scale(1/bbox.height);
+            playerSvgGroup.scale(PLAYER_HEIGHT/bbox.height);
         }
 
     };
