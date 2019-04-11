@@ -12,7 +12,7 @@ export const createGameData = (heightMap:HeightMap):GameData => {
     return {
         heightMap,
         player: {
-            pos: {x:5, y:0},
+            pos: {x:0, y:0},
             vel: {x:0, y:0},
             angle: 0,
             angleVel: 0,

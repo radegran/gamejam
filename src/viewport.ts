@@ -5,13 +5,14 @@ export type ViewPort = ReturnType<typeof createViewPort>;
 
 export const createViewPort = (s:SVG.Doc, layers:Array<LayerDefinition>, heightMap:HeightMap) => {
     
+    let zoomLevel = 1;
+
     s.viewbox({
         x: -VIEWPORT_WIDTH / 2,
         y: -VIEWPORT_WIDTH / 2,
         width: VIEWPORT_WIDTH,
         height: VIEWPORT_WIDTH
     });
-    let zoomLevel = 1;
 
     const zoom = (factor:number) => {
         let v = s.viewbox();
@@ -27,22 +28,17 @@ export const createViewPort = (s:SVG.Doc, layers:Array<LayerDefinition>, heightM
     };
 
     const adjustLayerPerspectives = (p:Point) => {
-
-        let layerBounds = heightMap.bounds();
-        let forSweingPartitions = 1;
-        
         layers.forEach(layer => {
             let layerSvg = s.select("#" + layer.id).get(0);
-            layerSvg.style("transform-origin", (p.x - (layerBounds.width + forSweingPartitions)/2) + "px " + (p.y) + "px");
-            layerSvg.scale(layer.scale);
+            layerSvg.scale(layer.scale, layer.scale, 0, 0);
+            layerSvg.translate(p.x*(1-layer.scale), p.y*(1-layer.scale));
         });
     };
 
     const resetLayerPerspectives = () => {
         layers.forEach(layer => {
             let layerSvg = s.select("#" + layer.id).get(0);
-            layerSvg.style("transform-origin", "0 0");
-            layerSvg.scale(1);
+            layerSvg.matrix(1, 0, 0, 1, 0, 0);
         });
     };
 
