@@ -13,12 +13,11 @@ import { loadSvg, loadLevelJson } from "./util";
 
 async function startGame(levelname:string) {
 
-    let svgString = (await loadSvg("levels/" + levelname + ".svg")).asText();
+    let loadedSvg = (await loadSvg("levels/" + levelname + ".svg")).asElement();
     let svgId = "mainsvg";
     let svgElement = document.getElementById(svgId);
-    svgElement.outerHTML = svgString;
-    
-    let s = SVG(svgElement);
+    svgElement.replaceWith(loadedSvg);
+    let s = SVG(document.getElementById(svgId));
 
     let heightMap = await loadLevelJson("levels/" + levelname + ".json");
     let gameData = createGameData(heightMap);
@@ -48,7 +47,7 @@ const startEditMode = () => {
 
     let layers = createLayers();
 
-    let heightMap = createHeightMap(2500);
+    let heightMap = createHeightMap(1500);
     let viewPort = createViewPort(s, layers, heightMap);
     
     // Editor

@@ -27,7 +27,8 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         layers.forEach(layer => {
             let elem = s.select("#" + layer.id).get(0) as SVG.G;
             if (!!elem) {
-                elem.translate(0, 0);
+                //elem.translate(0, 0);
+                elem.matrix(1, 0, 0, 1, 0, 0);
             }
         });
 
@@ -42,7 +43,7 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         let canvasWidth = s.node.getBoundingClientRect().width;
         applyTransition = setupPartitions(canvasWidth, viewPort.width(), layers, s);
 
-        playerSvgGroup = s.group();
+        playerSvgGroup = (s.select("#player-layer").get(0) as SVG.G).group();
         if (!playerSvg) {
             let elem = (await loadSvg("player.svg")).asElement();
             let elemText = elem.getElementsByTagName('g')[0].outerHTML;

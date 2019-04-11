@@ -22,17 +22,12 @@ export const loadSvg = async function(svgUrl:string) {
     let text = await response.text();
     
     return {
-        asText,
         asElement
-    };
-
-    function asText() {
-        return text;
     };
 
     function asElement() {
 	    const parser = new DOMParser();
         const parsed = parser.parseFromString(text, 'image/svg+xml');
-        return parsed;
+        return parsed.getElementsByTagName("svg")[0];
     };
 };
