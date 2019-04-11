@@ -7,6 +7,40 @@ interface NumCallback {
     (index:number): number
 }
 
+
+export const createGameData = (heightMap:HeightMap):GameData => {
+    return {
+        heightMap,
+        player: {
+            pos: {x:5, y:0},
+            vel: {x:0, y:0},
+            angle: 0,
+            angleVel: 0,
+            touchesGround: false
+        },
+        input: {
+            rotateLeft: false,
+            rotateRight: false,
+            jump: false
+        },
+        camFocus: {x:0, y:0}
+    };
+};
+
+const createLayerDefinition = (id:string, scale:number):LayerDefinition => ({
+    id,
+    scale
+});
+
+export const  createLayers = () => {
+    let layers:Array<LayerDefinition> = [
+        createLayerDefinition("background-layer", 0.3),
+        createLayerDefinition("player-layer", 1),
+        createLayerDefinition("foreground-layer", 1.2)
+    ];
+    return layers;
+};
+
 export interface HeightMap {
     setAll: (callback:NumCallback) => void,
     get: (index:number) => number,
