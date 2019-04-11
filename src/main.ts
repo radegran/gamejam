@@ -17,14 +17,14 @@ async function startGame(levelname:string) {
     let svgId = "mainsvg";
     let svgElement = document.getElementById(svgId);
     svgElement.outerHTML = svgString;
-
-    let s = SVG(document.getElementById(svgId));
+    
+    let s = SVG(svgElement);
 
     let heightMap = await loadLevelJson("levels/" + levelname + ".json");
     let gameData = createGameData(heightMap);
 
     let layers = createLayers();
-    let viewPort = createViewPort(svgId, layers, heightMap);
+    let viewPort = createViewPort(s, layers, heightMap);
     
     let view = createView(viewPort, s, layers);
     let gameLoop = GameLoop(stepState, view.update);
@@ -49,7 +49,7 @@ const startEditMode = () => {
     let layers = createLayers();
 
     let heightMap = createHeightMap(2500);
-    let viewPort = createViewPort(svgId, layers, heightMap);
+    let viewPort = createViewPort(s, layers, heightMap);
     
     // Editor
     let pathDrawer = createPathDrawer(s, heightMap, layers);

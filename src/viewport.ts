@@ -3,10 +3,8 @@ import { Point, LayerDefinition, HeightMap, VIEWPORT_WIDTH } from "./defs";
 
 export type ViewPort = ReturnType<typeof createViewPort>;
 
-export const createViewPort = (mainSvgId:string, layers:Array<LayerDefinition>, heightMap:HeightMap) => {
-    let element:HTMLElement = document.getElementById(mainSvgId);
-    let s = SVG(element);
-
+export const createViewPort = (s:SVG.Doc, layers:Array<LayerDefinition>, heightMap:HeightMap) => {
+    
     s.viewbox({
         x: -VIEWPORT_WIDTH / 2,
         y: -VIEWPORT_WIDTH / 2,
