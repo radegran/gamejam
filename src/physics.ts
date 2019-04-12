@@ -73,7 +73,7 @@ export const stepState = (dt:number, gameData:GameData) => {
     gameData.players.forEach(p => stepPlayerState(dt, p, gameData.heightMap));
 
     let averagePos = p(0, 0);
-    gameData.players.forEach(p => averagePos = add(averagePos, p.pos));
+    gameData.players.forEach(p => averagePos = add(averagePos, add(p.pos, vecToCenter(p))));
     averagePos = scale(averagePos, 1/gameData.players.length);
     
     gameData.camFocus = add(scale(averagePos, 1/5),
