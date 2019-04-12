@@ -1,14 +1,17 @@
-import { Player, KeyboardMap } from "./defs";
+import { Player, KeyboardMap, PlayerDef } from "./defs";
 
 type KeyboardInput = ReturnType<typeof createKeyboardInput>;
 
-export const bindPlayerKeyboardInput = (player:Player, keyMap:KeyboardMap, keyboardInput:KeyboardInput) => {
-    keyboardInput.onKeyDown(keyMap.right, () => { player.input.rotateRight = true; });
-    keyboardInput.onKeyUp(keyMap.right, () => { player.input.rotateRight = false; });
-    keyboardInput.onKeyDown(keyMap.left, () => { player.input.rotateLeft = true; });
-    keyboardInput.onKeyUp(keyMap.left, () => { player.input.rotateLeft = false; });
-    keyboardInput.onKeyDown(keyMap.up, () => { player.input.jump = true; });
-    keyboardInput.onKeyUp(keyMap.up, () => { player.input.jump = false; });
+export const bindPlayerKeyboardInput = (players:Array<Player>, playerDefs:Array<PlayerDef>, keyboardInput:KeyboardInput) => {
+    players.forEach((player, i) => {
+        let keyMap = playerDefs[i].keyMap;
+        keyboardInput.onKeyDown(keyMap.right, () => { player.input.rotateRight = true; });
+        keyboardInput.onKeyUp(keyMap.right, () => { player.input.rotateRight = false; });
+        keyboardInput.onKeyDown(keyMap.left, () => { player.input.rotateLeft = true; });
+        keyboardInput.onKeyUp(keyMap.left, () => { player.input.rotateLeft = false; });
+        keyboardInput.onKeyDown(keyMap.up, () => { player.input.jump = true; });
+        keyboardInput.onKeyUp(keyMap.up, () => { player.input.jump = false; });
+    });
 };
 
 export function createKeyboardInput() {

@@ -1,11 +1,10 @@
-import { GameData, Point, GRAVITY, PLAYER_HEIGHT } from "./defs";
+import { GameData, Point, GRAVITY, PLAYER_HEIGHT, Player, HeightMap } from "./defs";
 
-const vecToCenter = (player:GameData["player"]) => {
+const vecToCenter = (player:Player) => {
     return scale(p(-Math.sin(player.angle), -Math.cos(player.angle)), PLAYER_HEIGHT/2);
 };
 
-const getAngularAcceleration = (gameData:GameData) => {
-    let player = gameData.player;
+const getAngularAcceleration = (player:Player) => {
     let input = player.input;
     if (player.touchesGround) {
         return 0;
@@ -19,11 +18,9 @@ const getAngularAcceleration = (gameData:GameData) => {
     return -Math.sign(player.angleVel);
 };
 
-export const stepState = (dt:number, gameData:GameData) => {
-    let player = gameData.player;
-    let heightMap = gameData.heightMap;
-    
-    let angleAcc = getAngularAcceleration(gameData);
+const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap) => {
+
+    let angleAcc = getAngularAcceleration(player);
     player.angleVel += 20*angleAcc * dt/1000;
     player.angleVel = Math.max(-10, Math.min(10, player.angleVel));
 
@@ -67,14 +64,20 @@ export const stepState = (dt:number, gameData:GameData) => {
             player.angleVel = 0;
         }
     }
+    
+    player.touchesGround = throughGround > -0.1;
+};
 
-    let playerCenter = add(pos, vecToCenter(player));
-    let lookAheadOffset = 10 * Math.atan(vel.x / 10);
-    let playerCenterLookAhead = add(playerCenter, p(lookAheadOffset, 0));
+export const stepState = (dt:number, gameData:GameData) => {
 
-    gameData.camFocus = add(scale(playerCenterLookAhead, 1/30),
-                            scale(gameData.camFocus, 29/30));
-    gameData.player.touchesGround = throughGround > -0.1;
+    gameData.players.forEach(p => stepPlayerState(dt, p, gameData.heightMap));
+
+    let averagePos = p(0, 0);
+    gameData.players.forEach(p => averagePos = add(averagePos, p.pos));
+    averagePos = scale(averagePos, 1/gameData.players.length);
+    
+    gameData.camFocus = add(scale(averagePos, 1/5),
+                            scale(gameData.camFocus, 4/5));
 };
 
 const magnitude = (vec:Point) => {

@@ -4,7 +4,7 @@ import { GameLoop } from "./gameloop";
 import { createGameData, createLayers } from "./defs";
 import { createViewPort } from "./viewport";
 import { createPathDrawer } from "./editor-graphics";
-import { createHeightMap } from "./heightmap";
+import { createHeightMap, placePlayersOnGround } from "./heightmap";
 import { stepState } from "./physics";
 import SVG from "svgjs";
 import { test } from "./test";
@@ -19,14 +19,14 @@ async function startGame(levelname:string) {
 
     await welcomeScreen();
 
-    let players = await selectPlayers(SVG(svgElement)); 
+    let playerDefs = await selectPlayers(SVG(svgElement)); 
 
     let loadedSvg = (await loadSvg("levels/" + levelname + ".svg")).asElement();
     svgElement.replaceWith(loadedSvg);
     let s = SVG(document.getElementById(svgId));
 
     let heightMap = await loadLevelJson("levels/" + levelname + ".json");
-    let gameData = createGameData(heightMap, players);
+    let gameData = createGameData(heightMap, playerDefs);
     
     let layers = createLayers();
     let viewPort = createViewPort(s, layers);
@@ -34,12 +34,11 @@ async function startGame(levelname:string) {
     let view = createView(viewPort, s, layers);
     let gameLoop = GameLoop(stepState, view.update);
     
-    let keyboardMap = {right: 39, left: 37, up: 38};
     let keyboardinput = createKeyboardInput();
-    bindPlayerKeyboardInput(gameData.player, keyboardMap, keyboardinput);
+    bindPlayerKeyboardInput(gameData.players, playerDefs, keyboardinput);
     
-    gameData.player.pos.y = gameData.heightMap.get(gameData.player.pos.x);
-    view.setup();
+    placePlayersOnGround(gameData.players, heightMap);
+    view.setup(gameData.players);
     gameLoop.start(gameData);
 };
 
@@ -73,13 +72,11 @@ const startEditMode = () => {
             view.teardown();
         }
         else {
-            view.setup();
-
             let gameData = createGameData(heightMap, defaultPlayers);
-            gameData.player.pos.y = gameData.heightMap.get(gameData.player.pos.x);
+            view.setup(gameData.players);
             
-            let keyboardMap = {right: 39, left: 37, up: 38};
-            bindPlayerKeyboardInput(gameData.player, keyboardMap, temporaryKeyboardInput);
+            placePlayersOnGround(gameData.players, heightMap);
+            bindPlayerKeyboardInput(gameData.players, defaultPlayers, temporaryKeyboardInput);
             gameLoop.start(gameData);
         }
     });

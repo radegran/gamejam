@@ -1,22 +1,26 @@
 import { ViewPort } from "./viewport";
 import SVG from "svgjs";
-import { LayerDefinition, Point, GameData, PLAYER_HEIGHT } from "./defs";
+import { LayerDefinition, Point, GameData, PLAYER_HEIGHT, Player } from "./defs";
 import { setupPartitions } from "./partitioning";
 import { loadSvg } from "./util";
 
 export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefinition>) => {
     
-    let playerSvgGroup:SVG.G;
+    let playerSvgGroups: Array<SVG.G> = [];
     let previousCamFocus:Point = {x:0, y:0};
     let applyTransition:(from:Point, to:Point)=>void;
 
     const update = (gameData:GameData) => {
-        let playerPos = gameData.player.pos;
         viewPort.location(gameData.camFocus);
 
-        playerSvgGroup.rotate(180 * -gameData.player.angle / Math.PI);
-        playerSvgGroup.translate(playerPos.x, playerPos.y);
-        playerSvgGroup.style("color", gameData.player.touchesGround ? "red" : "salmon");
+        gameData.players.forEach((player, i) => {
+
+            let playerPos = player.pos;
+            let g = playerSvgGroups[i];
+            g.rotate(180 * -player.angle / Math.PI);
+            g.translate(playerPos.x, playerPos.y);
+            g.style("color", player.accentColor);
+        });
         
         applyTransition(previousCamFocus, gameData.camFocus);
         previousCamFocus = gameData.camFocus;
@@ -35,20 +39,24 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         viewPort.location({x:0, y:0});
     };
 
-    const setup = async () => {
+    const setup = async (players:Array<Player>) => {
         reset();
 
         // Performance: This is about not rendering svg elements that are not visible
         let canvasWidth = s.node.getBoundingClientRect().width;
         applyTransition = setupPartitions(canvasWidth, viewPort.width(), layers, s);
 
-        playerSvgGroup = (s.select("#player-layer").get(0) as SVG.G).group();
-
-        loadPlayerSvg(playerSvgGroup);    
+        playerSvgGroups = players.map(_ => {
+            let g = (s.select("#player-layer").get(0) as SVG.G).group();
+            loadPlayerSvg(g);
+            return g;
+        });    
     };
 
     const teardown = () => {
-        playerSvgGroup.remove();
+        while (playerSvgGroups.length) {
+            playerSvgGroups.pop().remove();
+        }
     };
     
     return {

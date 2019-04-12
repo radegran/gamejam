@@ -1,4 +1,10 @@
-import { HeightMap } from "./defs";
+import { HeightMap, Player } from "./defs";
+
+export const placePlayersOnGround = (players:Array<Player>, heightMap:HeightMap) => {
+    players.forEach(player => {
+        player.pos.y = heightMap.get(player.pos.x);
+    })
+};
 
 export const createHeightMap = (size:number) : HeightMap => {
     
@@ -26,7 +32,6 @@ export const createHeightMap = (size:number) : HeightMap => {
             let fraq = x - floor;
             return (1-fraq)*heightMap[floor] + (fraq)*heightMap[floor+1];
         }
-        return smoothEnabled_ ? getSmoothValue(x) : heightMap[Math.round(x)];
     };
 
     const getSmoothValue = (x:number) => smooth(x);
