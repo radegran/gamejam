@@ -1,7 +1,9 @@
-import { HeightMap, Player } from "./defs";
+import { HeightMap, Player, PLAYER_WIDTH } from "./defs";
 
-export const placePlayersOnGround = (players:Array<Player>, heightMap:HeightMap) => {
-    players.forEach(player => {
+export const placePlayersOnGround = (players:Array<Player>, heightMap:HeightMap, offsetX:number) => {
+    let list = [...players].sort((p1, p2) => p2.score - p1.score);
+    list.forEach((player, i) => {
+        player.pos.x = player.pos.x + offsetX + i*PLAYER_WIDTH;
         player.pos.y = heightMap.get(player.pos.x);
     })
 };

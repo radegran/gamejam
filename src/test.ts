@@ -1,4 +1,7 @@
 import { getPartitionLeftRight, Partition } from "./partitioning";
+import { createVerify } from "crypto";
+import { Point, Player } from "./defs";
+import { reflect, p, collidePlayerPair } from "./physics";
 
 const testPartitions = () => {
 
@@ -28,6 +31,52 @@ const testPartitions = () => {
         
 }
 
+const testReflect = () => {
+    const verifyEqual = (p1: Point, p2:Point) => {
+        if (p1.x !== p2.x || p1.y !== p2.y) {
+            console.log(p1.x + "," + p1.y + " not equal to " + p2.x + "," + p2.y);
+        }
+    };
+
+    verifyEqual(p(-1, 0), reflect(p(1, 0), p(1, 0)));
+    verifyEqual(p(10, -10), reflect(p(10, 10), p(0, 1)));
+    verifyEqual(p(0, -10), reflect(p(10, 0), p(1/Math.sqrt(2), 1/Math.sqrt(2))));
+};
+
+const testCollide = () => {
+    const verifyEqual = (p1: Point, p2:Point) => {
+        if (p1.x !== p2.x || p1.y !== p2.y) {
+            console.log(p1.x + "," + p1.y + " not equal to " + p2.x + "," + p2.y);
+        }
+    };
+
+    const makePlayer = (pos:Point, vel:Point) => {
+        let p:Player = {
+            accentColor:"a",
+            pos,
+            vel,
+            score: 0,
+            angle: 0,
+            angleVel: 0,
+            touchesGround: false,
+            input: {
+                rotateLeft: false,
+                rotateRight: false,
+                jump: false
+            }
+        }
+        return p;
+    };
+
+    let p1 = makePlayer(p(0, 0), p(1, 0));
+    let p2 = makePlayer(p(0.1, 0), p(0, 0));
+    collidePlayerPair(p1, p2);
+    verifyEqual(p1.vel, p(0, 0));
+    verifyEqual(p2.vel, p(1, 0));
+};
+
 export const test = () => {
     testPartitions();
+    testReflect();
+    testCollide();
 };

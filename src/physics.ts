@@ -1,4 +1,4 @@
-import { GameData, Point, GRAVITY, PLAYER_HEIGHT, Player, HeightMap } from "./defs";
+import { GameData, Point, GRAVITY, PLAYER_HEIGHT, Player, HeightMap, PLAYER_WIDTH } from "./defs";
 
 const vecToCenter = (player:Player) => {
     return scale(p(-Math.sin(player.angle), -Math.cos(player.angle)), PLAYER_HEIGHT/2);
@@ -68,10 +68,45 @@ const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap) => {
     player.touchesGround = throughGround > -0.1;
 };
 
+const proj = (vec:Point, onVec:Point) => scale(onVec, dot(vec, onVec));
+
+export const reflect = (vec: Point, normal:Point) => {
+    let tangent = p(-normal.y, normal.x);
+    let vecProjTangent = proj(vec, tangent);
+    let vecProjNormal = proj(vec, normal);
+    let result = add(vecProjTangent, scale(vecProjNormal, -1));
+    return result;
+};
+
+export const collidePlayerPair = (p1:Player, p2:Player) => {
+    let diff = sub(p2.pos, p1.pos);
+    let dist = magnitude(diff);
+    if (dist < PLAYER_WIDTH * 0.7) {
+        let velDiff = sub(p1.vel, p2.vel);
+        if (dot(velDiff, diff) > 0) {
+            // collision!
+            let normDiff = scale(diff, 1/dist);
+            p1.vel = add(p1.vel, reflect(velDiff, normDiff));
+            p2.vel = sub(p2.vel, reflect(velDiff, normDiff));
+        }
+    }
+};
+
 export const stepState = (dt:number, gameData:GameData) => {
 
-    gameData.players.forEach(p => stepPlayerState(dt, p, gameData.heightMap));
+    let players = gameData.players;
+    players.forEach(p => stepPlayerState(dt, p, gameData.heightMap));
 
+    // collide players
+    let numPlayers = players.length;
+    players.forEach((p1, p1i) => {
+        for (let p2i = p1i + 1; p2i < numPlayers; p2i++) {
+            let p2 = players[p2i];
+            collidePlayerPair(p1, p2);
+        }
+    })
+
+    // sort out cam focus
     let averagePos = p(0, 0);
     gameData.players.forEach(p => averagePos = add(averagePos, add(p.pos, vecToCenter(p))));
     averagePos = scale(averagePos, 1/gameData.players.length);
@@ -94,4 +129,4 @@ const scale = (vec:Point, scalar:number) => p(vec.x * scalar, vec.y * scalar);
 
 const norm = (vec:Point) => scale(vec, 1/magnitude(vec));
 
-const p = (x:number, y:number) => ({x, y});
+export const p = (x:number, y:number) => ({x, y});

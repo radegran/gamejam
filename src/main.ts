@@ -36,9 +36,9 @@ async function startGame(levelname:string) {
     
     let keyboardinput = createKeyboardInput();
     bindPlayerKeyboardInput(gameData.players, playerDefs, keyboardinput);
-    
-    placePlayersOnGround(gameData.players, heightMap);
     view.setup(gameData.players);
+    
+    placePlayersOnGround(gameData.players, heightMap, 1);
     gameLoop.start(gameData);
 };
 
@@ -75,7 +75,7 @@ const startEditMode = () => {
             let gameData = createGameData(heightMap, defaultPlayers);
             view.setup(gameData.players);
             
-            placePlayersOnGround(gameData.players, heightMap);
+            placePlayersOnGround(gameData.players, heightMap, 1);
             bindPlayerKeyboardInput(gameData.players, defaultPlayers, temporaryKeyboardInput);
             gameLoop.start(gameData);
         }
