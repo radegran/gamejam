@@ -7,9 +7,8 @@ import { loadSvg } from "./util";
 export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefinition>) => {
     
     let playerSvgGroup:SVG.G;
-    let playerSvg:SVG.Element;
-    let applyTransition:(from:Point, to:Point)=>void;
     let previousCamFocus:Point = {x:0, y:0};
+    let applyTransition:(from:Point, to:Point)=>void;
 
     const update = (gameData:GameData) => {
         let playerPos = gameData.player.pos;
@@ -44,14 +43,8 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         applyTransition = setupPartitions(canvasWidth, viewPort.width(), layers, s);
 
         playerSvgGroup = (s.select("#player-layer").get(0) as SVG.G).group();
-        if (!playerSvg) {
-            let elem = (await loadSvg("player.svg")).asElement();
-            let elemText = elem.getElementsByTagName('g')[0].outerHTML;
-            playerSvgGroup.svg(elemText);
-            let bbox = playerSvgGroup.bbox();
-            playerSvgGroup.scale(PLAYER_HEIGHT/bbox.height);
-        }
 
+        loadPlayerSvg(playerSvgGroup);    
     };
 
     const teardown = () => {
@@ -63,4 +56,16 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         setup,
         teardown
     };
+};
+
+let playerCached:SVGSVGElement; 
+export const loadPlayerSvg = async (g:SVG.G) => {
+    if (!playerCached) {
+        let elem = (await loadSvg("player.svg")).asElement();
+        playerCached = elem;
+    }
+    let elemText = playerCached.getElementsByTagName('g')[0].outerHTML;
+    g.svg(elemText);
+    let bbox = g.bbox();
+    g.scale(PLAYER_HEIGHT/bbox.height, PLAYER_HEIGHT/bbox.height, 0, 0);
 };

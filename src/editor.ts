@@ -1,10 +1,10 @@
 import SVG from "svgjs";
 import { PathDrawer } from "./editor-graphics";
 import { isCloseToPath } from "./util";
-import { Point, LayerDefinition, GameData } from "./defs";
-import { createViewPort, ViewPort } from "./viewport";
+import { Point, GameData } from "./defs";
+import { ViewPort } from "./viewport";
 import { MouseInput } from "./mouseinput";
-import { KeyboardInput } from "./keyboardinput";
+import { createKeyboardInput } from "./keyboardinput";
 
 const decayedWeight = (zoomLevel:number) => (distFromFocus:number) => {
     let adjustedDist = distFromFocus / zoomLevel;
@@ -36,7 +36,7 @@ export const Editor = (gamedata:GameData, viewPort:ViewPort, pathDrawer:PathDraw
     let s = SVG(mainSvg);
 
     let mouseInput = MouseInput(mainSvg);
-    let keyboardInput = KeyboardInput();
+    let keyboardInput = createKeyboardInput();
 
     const startChangeHeights = (pDown:Point) => {
         heightMap.smoothEnabled(false);

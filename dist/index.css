@@ -2,6 +2,26 @@ body {
     margin: 0;
 }
 
+.welcome {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(welcome.png);
+    background-size: cover;
+    background-position: center;
+}
+
+.selectPlayers {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+/*    background-image: url(welcome.png);
+    background-size: cover;
+    background-position: center; */
+}
+
 .aligner {    
   display: flex;
   flex-direction: row;

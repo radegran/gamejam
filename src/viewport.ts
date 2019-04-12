@@ -3,7 +3,7 @@ import { Point, LayerDefinition, HeightMap, VIEWPORT_WIDTH } from "./defs";
 
 export type ViewPort = ReturnType<typeof createViewPort>;
 
-export const createViewPort = (s:SVG.Doc, layers:Array<LayerDefinition>, heightMap:HeightMap) => {
+export const createViewPort = (s:SVG.Doc, layers:Array<LayerDefinition>) => {
     
     let zoomLevel = 1;
 

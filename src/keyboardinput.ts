@@ -1,8 +1,17 @@
-import { Point, PointCallback} from "./defs";
-import SVG from "svgjs";
-import { stringify } from "querystring";
+import { Player, KeyboardMap } from "./defs";
 
-export function KeyboardInput() {
+type KeyboardInput = ReturnType<typeof createKeyboardInput>;
+
+export const bindPlayerKeyboardInput = (player:Player, keyMap:KeyboardMap, keyboardInput:KeyboardInput) => {
+    keyboardInput.onKeyDown(keyMap.right, () => { player.input.rotateRight = true; });
+    keyboardInput.onKeyUp(keyMap.right, () => { player.input.rotateRight = false; });
+    keyboardInput.onKeyDown(keyMap.left, () => { player.input.rotateLeft = true; });
+    keyboardInput.onKeyUp(keyMap.left, () => { player.input.rotateLeft = false; });
+    keyboardInput.onKeyDown(keyMap.up, () => { player.input.jump = true; });
+    keyboardInput.onKeyUp(keyMap.up, () => { player.input.jump = false; });
+};
+
+export function createKeyboardInput() {
     
     let addedHandlers = Array<any>();
 

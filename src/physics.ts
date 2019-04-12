@@ -5,16 +5,18 @@ const vecToCenter = (player:GameData["player"]) => {
 };
 
 const getAngularAcceleration = (gameData:GameData) => {
-    if (gameData.player.touchesGround) {
+    let player = gameData.player;
+    let input = player.input;
+    if (player.touchesGround) {
         return 0;
     }
-    if (gameData.input.rotateRight) {
+    if (input.rotateRight) {
         return -1;
     }
-    if (gameData.input.rotateLeft) {
+    if (input.rotateLeft) {
         return 1;
     }
-    return -Math.sign(gameData.player.angleVel);
+    return -Math.sign(player.angleVel);
 };
 
 export const stepState = (dt:number, gameData:GameData) => {
@@ -45,7 +47,7 @@ export const stepState = (dt:number, gameData:GameData) => {
     let groundNormal = p(slope, -delta);
         
     const throughGround = pos.y - heightMap.get(pos.x);
-    if (throughGround > -0.1 && gameData.input.jump) {
+    if (throughGround > -0.1 && player.input.jump) {
         player.vel = add(vel, scale(norm(groundNormal), 1));
     } 
     else if (throughGround > 0) {

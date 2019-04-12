@@ -1,5 +1,5 @@
 import { Editor } from "./editor";
-import { KeyboardInput } from "./keyboardinput";
+import { createKeyboardInput, bindPlayerKeyboardInput } from "./keyboardinput";
 import { GameLoop } from "./gameloop";
 import { createGameData, createLayers } from "./defs";
 import { createViewPort } from "./viewport";
@@ -10,33 +10,35 @@ import SVG from "svgjs";
 import { test } from "./test";
 import { createView } from "./view";
 import { loadSvg, loadLevelJson } from "./util";
+import { welcomeScreen, selectPlayers, createPlayerDefinitions } from "./welcome";
 
 async function startGame(levelname:string) {
 
-    let loadedSvg = (await loadSvg("levels/" + levelname + ".svg")).asElement();
     let svgId = "mainsvg";
     let svgElement = document.getElementById(svgId);
+
+    await welcomeScreen();
+
+    let players = await selectPlayers(SVG(svgElement)); 
+
+    let loadedSvg = (await loadSvg("levels/" + levelname + ".svg")).asElement();
     svgElement.replaceWith(loadedSvg);
     let s = SVG(document.getElementById(svgId));
 
     let heightMap = await loadLevelJson("levels/" + levelname + ".json");
-    let gameData = createGameData(heightMap);
-
+    let gameData = createGameData(heightMap, players);
+    
     let layers = createLayers();
-    let viewPort = createViewPort(s, layers, heightMap);
+    let viewPort = createViewPort(s, layers);
     
     let view = createView(viewPort, s, layers);
     let gameLoop = GameLoop(stepState, view.update);
     
-    let keyboardinput = KeyboardInput();
-    gameData.player.pos.y = gameData.heightMap.get(gameData.player.pos.x);
-    keyboardinput.onKeyDown(39, () => { gameData.input.rotateRight = true; });
-    keyboardinput.onKeyUp(39, () => { gameData.input.rotateRight = false; });
-    keyboardinput.onKeyDown(37, () => { gameData.input.rotateLeft = true; });
-    keyboardinput.onKeyUp(37, () => { gameData.input.rotateLeft = false; });
-    keyboardinput.onKeyDown(38, () => { gameData.input.jump = true; });
-    keyboardinput.onKeyUp(38, () => { gameData.input.jump = false; });
+    let keyboardMap = {right: 39, left: 37, up: 38};
+    let keyboardinput = createKeyboardInput();
+    bindPlayerKeyboardInput(gameData.player, keyboardMap, keyboardinput);
     
+    gameData.player.pos.y = gameData.heightMap.get(gameData.player.pos.x);
     view.setup();
     gameLoop.start(gameData);
 };
@@ -48,19 +50,21 @@ const startEditMode = () => {
     let layers = createLayers();
 
     let heightMap = createHeightMap(1500);
-    let viewPort = createViewPort(s, layers, heightMap);
+    let viewPort = createViewPort(s, layers);
+
+    let defaultPlayers = [createPlayerDefinitions()[2]]
     
     // Editor
     let pathDrawer = createPathDrawer(s, heightMap, layers);
-    let editor = Editor(createGameData(heightMap), viewPort, pathDrawer);    
+    let editor = Editor(createGameData(heightMap, defaultPlayers), viewPort, pathDrawer);    
 
     // Game
     let view = createView(viewPort, s, layers);
     let gameLoop = GameLoop(stepState, view.update);
 
-    let temporaryKeyboardInput = KeyboardInput();
+    let temporaryKeyboardInput = createKeyboardInput();
     // Toggle Game/Editor
-    KeyboardInput().onKeyDown(32, () => {   // Space
+    createKeyboardInput().onKeyDown(32, () => {   // Space
         temporaryKeyboardInput.off();
 
         let editorVisible = editor.toggle();
@@ -71,14 +75,11 @@ const startEditMode = () => {
         else {
             view.setup();
 
-            let gameData = createGameData(heightMap);
+            let gameData = createGameData(heightMap, defaultPlayers);
             gameData.player.pos.y = gameData.heightMap.get(gameData.player.pos.x);
-            temporaryKeyboardInput.onKeyDown(39, () => { gameData.input.rotateRight = true; });
-            temporaryKeyboardInput.onKeyUp(39, () => { gameData.input.rotateRight = false; });
-            temporaryKeyboardInput.onKeyDown(37, () => { gameData.input.rotateLeft = true; });
-            temporaryKeyboardInput.onKeyUp(37, () => { gameData.input.rotateLeft = false; });
-            temporaryKeyboardInput.onKeyDown(38, () => { gameData.input.jump = true; });
-            temporaryKeyboardInput.onKeyUp(38, () => { gameData.input.jump = false; });
+            
+            let keyboardMap = {right: 39, left: 37, up: 38};
+            bindPlayerKeyboardInput(gameData.player, keyboardMap, temporaryKeyboardInput);
             gameLoop.start(gameData);
         }
     });

@@ -1,9 +1,9 @@
-import { KeyboardInput } from "./keyboardinput";
+import { createKeyboardInput } from "./keyboardinput";
 import { GameData } from "./defs";
 
 export const GameLoop = (updateGameState:(dt:number, gameData:GameData)=>void ,updateGameView:(gameData:GameData)=>void) => {
 
-    const keyboard = KeyboardInput();
+    const keyboard = createKeyboardInput();
     const TIME_STEP = 10; 
     let gameData:GameData;
     let animationFrameTimeout:any = null;

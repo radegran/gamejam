@@ -7,22 +7,31 @@ interface NumCallback {
     (index:number): number
 }
 
+export interface PlayerDef {
+    keyMap: KeyboardMap,
+    accentColor: string
+}
 
-export const createGameData = (heightMap:HeightMap):GameData => {
-    return {
-        heightMap,
-        player: {
+export const createGameData = (heightMap:HeightMap, playerDefs:Array<PlayerDef>):GameData => {
+    
+    let players:Array<Player> = playerDefs.map(def => (
+        {
+            id: 0,
             pos: {x:0, y:0},
             vel: {x:0, y:0},
             angle: 0,
             angleVel: 0,
-            touchesGround: false
-        },
-        input: {
-            rotateLeft: false,
-            rotateRight: false,
-            jump: false
-        },
+            touchesGround: false,
+            input: {
+                rotateLeft: false,
+                rotateRight: false,
+                jump: false
+            }
+        }));
+
+    return {
+        heightMap,
+        player: players[0],
         camFocus: {x:0, y:0}
     };
 };
@@ -60,20 +69,29 @@ export interface PointCallback {
     (p:Point): void
 }
 
-export interface GameData {
-    heightMap: HeightMap,
-    player: {
-        pos: Point,
-        vel: Point,
-        angle: number,
-        angleVel: number,
-        touchesGround: boolean;
-    },
+export interface Player {
+    id: number,
+    pos: Point,
+    vel: Point,
+    angle: number,
+    angleVel: number,
+    touchesGround: boolean;
     input: {
         rotateRight: boolean,
         rotateLeft: boolean,
         jump: boolean
     }
+}
+
+export interface KeyboardMap {
+    left:number,
+    right:number,
+    up:number
+};
+
+export interface GameData {
+    heightMap: HeightMap,
+    player: Player,
     camFocus: Point
 }
 
