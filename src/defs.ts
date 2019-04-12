@@ -16,6 +16,7 @@ export const createGameData = (heightMap:HeightMap, playerDefs:Array<PlayerDef>)
     
     let players:Array<Player> = playerDefs.map(def => (
         {
+            score: 0,
             accentColor: def.accentColor,
             pos: {x:0, y:0},
             vel: {x:0, y:0},
@@ -70,6 +71,7 @@ export interface PointCallback {
 }
 
 export interface Player {
+    score: number,
     accentColor: string,
     pos: Point,
     vel: Point,
