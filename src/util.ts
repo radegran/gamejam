@@ -17,17 +17,23 @@ export const loadLevelJson = async (levelName:string) => {
     return heightMap;
 };
 
+let svgCache = {};
+
 export const loadSvg = async function(svgUrl:string) {
-    let response = await fetch(svgUrl);
-    let text = await response.text();
-    
+    let cachedText = svgCache[svgUrl];
+
+    if (!cachedText) {
+        let response = await fetch(svgUrl);
+        cachedText = await response.text();    
+    }
+
     return {
         asElement
     };
 
     function asElement() {
 	    const parser = new DOMParser();
-        const parsed = parser.parseFromString(text, 'image/svg+xml');
+        const parsed = parser.parseFromString(cachedText, 'image/svg+xml');
         return parsed.getElementsByTagName("svg")[0];
     };
 };

@@ -69,6 +69,16 @@ export interface Point {
     y:number
 }
 
+export const defineResources = (levelname:string) => {
+    return {
+        levelSvg: "levels/" + levelname + ".svg",
+        playerSvg: "player.svg",
+        levelJson: "levels/" + levelname + ".json"
+    };
+}
+
+export type Resources = ReturnType<typeof defineResources>;
+
 export interface PointCallback {
     (p:Point): void
 }

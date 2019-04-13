@@ -1,10 +1,10 @@
 import { ViewPort } from "./viewport";
 import SVG from "svgjs";
-import { LayerDefinition, Point, GameData, PLAYER_HEIGHT, Player, VIEWPORT_WIDTH, PLAYER_WIDTH } from "./defs";
+import { LayerDefinition, Point, GameData, PLAYER_HEIGHT, Player, VIEWPORT_WIDTH, PLAYER_WIDTH, Resources } from "./defs";
 import { setupPartitions } from "./partitioning";
 import { loadSvg, isStillInTheGame, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
 
-const showRoundResults = (s:SVG.Doc, viewPort:ViewPort, players:Array<Player>, isGameOver:boolean) => {
+const showRoundResults = (s:SVG.Doc, viewPort:ViewPort, players:Array<Player>, isGameOver:boolean, resources:Resources) => {
     let elem = s.select(".roundResultsContainer").get(0) as SVG.G;
     if (!elem) {
         elem = s.group().addClass("roundResultsContainer");
@@ -24,7 +24,7 @@ const showRoundResults = (s:SVG.Doc, viewPort:ViewPort, players:Array<Player>, i
 
         players.forEach((p, i) => {
             let row = innerElem.group().translate(leftAlign, topAlign + i*rowHeight);
-            loadPlayerSvg(row.group().style("color", p.accentColor));
+            loadPlayerSvg(row.group().style("color", p.accentColor), resources);
 
             let points = row.group();
             for (var i = 0; i < 10; i++) {
@@ -52,7 +52,7 @@ const hideRoundResults = (s:SVG.Doc) => {
     }
 };
 
-export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefinition>) => {
+export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefinition>, resources:Resources) => {
     
     let playerSvgGroups: Array<SVG.G> = [];
     let previousCamFocus:Point = {x:0, y:0};
@@ -62,7 +62,7 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         viewPort.location(gameData.camFocus);
         
         if (timeSinceOnlyOnPlayerStillInTheGame(gameData) > 0 || gameData.isGameOver) {
-            showRoundResults(s, viewPort, gameData.players, gameData.isGameOver);
+            showRoundResults(s, viewPort, gameData.players, gameData.isGameOver, resources);
         } else {
             hideRoundResults(s);
         }
@@ -104,7 +104,7 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
 
         playerSvgGroups = players.map(_ => {
             let g = (s.select("#player-layer").get(0) as SVG.G).group();
-            loadPlayerSvg(g);
+            loadPlayerSvg(g, resources);
             return g;
         });    
     };
@@ -122,13 +122,9 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
     };
 };
 
-let playerCached:SVGSVGElement; 
-export const loadPlayerSvg = async (g:SVG.G) => {
-    if (!playerCached) {
-        let elem = (await loadSvg("player.svg")).asElement();
-        playerCached = elem;
-    }
-    let elemText = playerCached.getElementsByTagName('g')[0].outerHTML;
+export const loadPlayerSvg = async (g:SVG.G, resouces:Resources) => {
+    let elem = (await loadSvg(resouces.playerSvg)).asElement();
+    let elemText = elem.getElementsByTagName('g')[0].outerHTML;
     g.svg(elemText);
     let bbox = g.bbox();
     g.scale(PLAYER_HEIGHT/bbox.height, PLAYER_HEIGHT/bbox.height, 0, 0);

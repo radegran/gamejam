@@ -1,7 +1,8 @@
 import { createKeyboardInput } from "./keyboardinput";
-import { PLAYER_HEIGHT, PlayerDef } from "./defs";
+import { PLAYER_HEIGHT, PlayerDef, Resources } from "./defs";
 import SVG from "svgjs";
 import { loadPlayerSvg } from "./view";
+import { loadSvg, loadLevelJson } from "./util";
 
 export const createPlayerDefinitions = ():Array<PlayerDef> => {
     let players = [
@@ -34,17 +35,30 @@ const makeDiv = (className:string) => {
     return div;
 };
 
-export const welcomeScreen = async () => {
+const preLoadResources = async (resources:Resources) => {
+    await loadSvg(resources.levelSvg);
+    await loadSvg(resources.playerSvg);
+    await loadLevelJson(resources.levelJson);
+    await new Promise((res) => {
+        window.setTimeout(res, 1000);
+    })
+}
+
+export const welcomeScreen = async (resources:Resources) => {
     let welcomeDiv = makeDiv("welcome");
     let keyBoard = createKeyboardInput();
 
+    welcomeDiv.className = "welcome loading";
+    await preLoadResources(resources);
+    welcomeDiv.className = "welcome loadingdone";
+    
     await new Promise(resolve => keyBoard.onKeyDown(32, resolve));
 
     keyBoard.off();
     welcomeDiv.remove();
 };
 
-export const selectPlayers = async (s:SVG.Doc) => {
+export const selectPlayers = async (s:SVG.Doc, resources:Resources) => {
     let playerDefs = createPlayerDefinitions();
     let participatingPlayers = new Set<PlayerDef>();
     let keyBoard = createKeyboardInput();
@@ -63,7 +77,7 @@ export const selectPlayers = async (s:SVG.Doc) => {
             .translate(-3 + i*6/3, PLAYER_HEIGHT/2)
             .opacity(0.3)
             .style("color", p.accentColor);
-        loadPlayerSvg(g);
+        loadPlayerSvg(g, resources);
         toCleanup.push(g);
 
         let action = participate(p, g);

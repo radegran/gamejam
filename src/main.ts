@@ -1,7 +1,7 @@
 import { Editor } from "./editor";
 import { createKeyboardInput, bindPlayerKeyboardInput } from "./keyboardinput";
 import { GameLoop } from "./gameloop";
-import { createGameData, createLayers, GameData, HeightMap } from "./defs";
+import { createGameData, createLayers, GameData, Resources, defineResources } from "./defs";
 import { createViewPort } from "./viewport";
 import { createPathDrawer } from "./editor-graphics";
 import { createHeightMap, placePlayersOnGround } from "./heightmap";
@@ -12,25 +12,25 @@ import { createView } from "./view";
 import { loadSvg, loadLevelJson, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
 import { welcomeScreen, selectPlayers, createPlayerDefinitions } from "./welcome";
 
-async function startGame(levelname:string) {
+async function startGame(resources:Resources) {
 
     let svgId = "mainsvg";
     let svgElement = document.getElementById(svgId);
 
-    await welcomeScreen();
+    await welcomeScreen(resources);
 
-    let playerDefs = await selectPlayers(SVG(svgElement)); 
+    let playerDefs = await selectPlayers(SVG(svgElement), resources); 
 
-    let loadedSvg = (await loadSvg("levels/" + levelname + ".svg")).asElement();
+    let loadedSvg = (await loadSvg(resources.levelSvg)).asElement();
     svgElement.replaceWith(loadedSvg);
     let s = SVG(document.getElementById(svgId));
 
-    let heightMap = await loadLevelJson("levels/" + levelname + ".json");
+    let heightMap = await loadLevelJson(resources.levelJson);
     
     let layers = createLayers();
     let viewPort = createViewPort(s, layers);
     
-    let view = createView(viewPort, s, layers);
+    let view = createView(viewPort, s, layers, resources);
     let gameLoop = GameLoop(stepState, view.update);
     
     let keyboardinput = createKeyboardInput();
@@ -71,7 +71,7 @@ const tryRestartGame = (gameData:GameData) => {
     return false;
 }
 
-const startEditMode = () => {
+const startEditMode = (resources:Resources) => {
     let svgId = "mainsvg";
     let s = SVG(document.getElementById(svgId));
 
@@ -87,7 +87,7 @@ const startEditMode = () => {
     let editor = Editor(createGameData(heightMap, defaultPlayers), viewPort, pathDrawer);    
 
     // Game
-    let view = createView(viewPort, s, layers);
+    let view = createView(viewPort, s, layers, resources);
     let gameLoop = GameLoop(stepState, view.update);
 
     let temporaryKeyboardInput = createKeyboardInput();
@@ -120,7 +120,7 @@ function main() {
 
     if (href.search(/\?edit/) > -1) {
         // ENTER EDIT MODE
-        startEditMode();
+        startEditMode(defineResources("none"));
     }
     else {
         // ENTER GAMING MODE
@@ -128,7 +128,8 @@ function main() {
         if (href.search(/\?level=/) > -1) {
             levelname = href.split("?level=")[1];
         }
-        startGame(levelname);
+
+        startGame(defineResources(levelname));
     }
 };
 
