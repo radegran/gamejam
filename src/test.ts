@@ -52,6 +52,7 @@ const testCollide = () => {
 
     const makePlayer = (pos:Point, vel:Point) => {
         let p:Player = {
+            droppedOutTime: 1e14,
             accentColor:"a",
             pos,
             vel,

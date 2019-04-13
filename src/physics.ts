@@ -1,4 +1,5 @@
-import { GameData, Point, GRAVITY, PLAYER_HEIGHT, Player, HeightMap, PLAYER_WIDTH } from "./defs";
+import { GameData, Point, GRAVITY, PLAYER_HEIGHT, Player, HeightMap, PLAYER_WIDTH, VIEWPORT_WIDTH } from "./defs";
+import { isStillInTheGame, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
 
 const vecToCenter = (player:Player) => {
     return scale(p(-Math.sin(player.angle), -Math.cos(player.angle)), PLAYER_HEIGHT/2);
@@ -92,27 +93,65 @@ export const collidePlayerPair = (p1:Player, p2:Player) => {
     }
 };
 
-export const stepState = (dt:number, gameData:GameData) => {
-
-    let players = gameData.players;
-    players.forEach(p => stepPlayerState(dt, p, gameData.heightMap));
-
-    // collide players
+const collidePlayers = (players:Array<Player>) => {
     let numPlayers = players.length;
     players.forEach((p1, p1i) => {
         for (let p2i = p1i + 1; p2i < numPlayers; p2i++) {
             let p2 = players[p2i];
             collidePlayerPair(p1, p2);
         }
-    })
+    });
+};
 
-    // sort out cam focus
-    let averagePos = p(0, 0);
-    gameData.players.forEach(p => averagePos = add(averagePos, add(p.pos, vecToCenter(p))));
-    averagePos = scale(averagePos, 1/gameData.players.length);
+const calcCamFocus = (player:Player, gameData:GameData) => {
     
-    gameData.camFocus = add(scale(averagePos, 1/5),
-                            scale(gameData.camFocus, 4/5));
+    let playerCenter = add(player.pos, vecToCenter(player));
+    let currentFocus = gameData.camFocus;
+
+    let W = 5 + Math.pow(2, 10*(timeSinceOnlyOnPlayerStillInTheGame(gameData) / 1000));
+
+    return add(scale(playerCenter, 1/W),
+               scale(currentFocus, (W-1)/W));
+};
+
+const calcPlayerLead = (players:Array<Player>) => {
+    let lead = players[0];
+    players.forEach(p => {
+        if (p.pos.x > lead.pos.x) {
+            lead = p;
+        }
+    });
+    return lead;
+};
+
+export const stepState = (dt:number, gameData:GameData) => {
+    gameData.elapsedTime += dt;
+
+    let remainingPlayers = gameData.players.filter(isStillInTheGame);
+
+    remainingPlayers.forEach(p => stepPlayerState(dt, p, gameData.heightMap));
+
+    collidePlayers(remainingPlayers);
+    
+    let playerLead = calcPlayerLead(remainingPlayers);
+
+    gameData.camFocus = calcCamFocus(playerLead, gameData);
+
+    let f = gameData.camFocus;
+    remainingPlayers.forEach(p => {
+        if (p.accentColor === playerLead.accentColor) {
+            return;        }
+
+        if (p.pos.x < f.x - 0.9*VIEWPORT_WIDTH/2 ||
+            p.pos.y > f.y + 0.9*VIEWPORT_WIDTH/2) {
+                p.droppedOutTime = gameData.elapsedTime;
+
+                if (remainingPlayers.length == 2) {
+                    // We have a winner
+                    //remainingPlayers.find(isStillInTheGame).roundPlacement = 1;
+                }
+            }
+    });
 };
 
 const magnitude = (vec:Point) => {

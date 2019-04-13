@@ -1,4 +1,4 @@
-import { Point, HeightMap } from "./defs";
+import { Point, HeightMap, Player, GameData } from "./defs";
 import { createHeightMap } from "./heightmap";
 
 export const isCloseToPath = (p:Point, heights:HeightMap, tolerance:number) => {
@@ -30,4 +30,25 @@ export const loadSvg = async function(svgUrl:string) {
         const parsed = parser.parseFromString(text, 'image/svg+xml');
         return parsed.getElementsByTagName("svg")[0];
     };
+};
+
+export const isStillInTheGame = (player:Player) => {
+    return player.droppedOutTime < 0;
+};
+
+export const timeSinceOnlyOnPlayerStillInTheGame = (gameData:GameData) => {
+    let playersStillInTheGame = 0;
+    let timeForLastPlayerDroppedOut = 0; 
+    let elapsedTime = gameData.elapsedTime;
+
+    gameData.players.forEach(p => {
+        let droppedOutTime = p.droppedOutTime;
+        if (droppedOutTime < 0) {
+            playersStillInTheGame++;
+        } else {
+            timeForLastPlayerDroppedOut = Math.max(timeForLastPlayerDroppedOut, droppedOutTime);
+        }
+    });
+
+    return playersStillInTheGame === 1 ? (elapsedTime - timeForLastPlayerDroppedOut) : 0
 };

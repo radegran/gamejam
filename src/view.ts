@@ -2,7 +2,7 @@ import { ViewPort } from "./viewport";
 import SVG from "svgjs";
 import { LayerDefinition, Point, GameData, PLAYER_HEIGHT, Player } from "./defs";
 import { setupPartitions } from "./partitioning";
-import { loadSvg } from "./util";
+import { loadSvg, isStillInTheGame } from "./util";
 
 export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefinition>) => {
     
@@ -12,8 +12,11 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
 
     const update = (gameData:GameData) => {
         viewPort.location(gameData.camFocus);
-
+        
         gameData.players.forEach((player, i) => {
+            if (!isStillInTheGame(player)) {
+                return;
+            }
 
             let playerPos = player.pos;
             let g = playerSvgGroups[i];
@@ -21,7 +24,7 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
             g.translate(playerPos.x, playerPos.y);
             g.style("color", player.accentColor);
         });
-        
+
         applyTransition(previousCamFocus, gameData.camFocus);
         previousCamFocus = gameData.camFocus;
     };
@@ -30,7 +33,6 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         layers.forEach(layer => {
             let elem = s.select("#" + layer.id).get(0) as SVG.G;
             if (!!elem) {
-                //elem.translate(0, 0);
                 elem.matrix(1, 0, 0, 1, 0, 0);
             }
         });

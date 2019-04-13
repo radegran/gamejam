@@ -17,6 +17,7 @@ export const createGameData = (heightMap:HeightMap, playerDefs:Array<PlayerDef>)
     let players:Array<Player> = playerDefs.map(def => (
         {
             score: 0,
+            droppedOutTime: -1,
             accentColor: def.accentColor,
             pos: {x:0, y:0},
             vel: {x:0, y:0},
@@ -31,6 +32,7 @@ export const createGameData = (heightMap:HeightMap, playerDefs:Array<PlayerDef>)
         }));
 
     return {
+        elapsedTime: 0,
         heightMap,
         players: players,
         camFocus: {x:0, y:0}
@@ -72,6 +74,7 @@ export interface PointCallback {
 
 export interface Player {
     score: number,
+    droppedOutTime: number,
     accentColor: string,
     pos: Point,
     vel: Point,
@@ -92,6 +95,7 @@ export interface KeyboardMap {
 };
 
 export interface GameData {
+    elapsedTime: 0,
     heightMap: HeightMap,
     players: Array<Player>,
     camFocus: Point
