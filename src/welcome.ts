@@ -35,22 +35,31 @@ const makeDiv = (className:string) => {
     return div;
 };
 
+
+
 const preLoadResources = async (resources:Resources) => {
-    await loadSvg(resources.levelSvg);
-    await loadSvg(resources.playerSvg);
-    await loadLevelJson(resources.levelJson);
-    await new Promise((res) => {
-        window.setTimeout(res, 1000);
-    })
+    let ps:Array<Promise<void>> = [];
+
+    const awaitParallel = (f:()=>void) => {
+        ps.push(new Promise(async (res) => {
+            await f();
+            res();
+        }));
+    };
+
+    awaitParallel(async () => await loadSvg(resources.levelSvg));
+    awaitParallel(async () => await loadSvg(resources.playerSvg));
+    awaitParallel(async () => await loadLevelJson(resources.levelJson));
+
+    await Promise.all(ps);
 }
 
 export const welcomeScreen = async (resources:Resources) => {
-    let welcomeDiv = makeDiv("welcome");
+    let welcomeDiv = makeDiv("welcome loading");
     let keyBoard = createKeyboardInput();
 
-    welcomeDiv.className = "welcome loading";
     await preLoadResources(resources);
-    welcomeDiv.className = "welcome loadingdone";
+    welcomeDiv.className = "welcome";
     
     await new Promise(resolve => keyBoard.onKeyDown(32, resolve));
 

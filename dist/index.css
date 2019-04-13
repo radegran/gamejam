@@ -10,33 +10,11 @@ body {
     background-image: url(welcome.png);
     background-size: cover;
     background-position: center;
+    transition: filter 0.3s linear;
 }
 
 .loading {
-    animation: shaking 0.3s linear infinite; 
-}
-
-@keyframes shaking {
-    0% {
-        transform: rotate(0deg) scale(0.05);
-    }
-    100% {
-        transform: rotate(360deg) scale(0.05);
-    }
-}
-
-@keyframes shakingdone {
-    0% {
-        transform: rotate(0deg) scale(0.05);
-
-    }
-    100% {
-        transform: rotate(360deg) scale(1);
-    }
-}
-
-.loadingdone {
-    animation: shakingdone 0.5s ease forwards;
+    filter: grayscale(90%)
 }
 
 .gameResults {
