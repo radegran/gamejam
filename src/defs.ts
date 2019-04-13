@@ -32,6 +32,7 @@ export const createGameData = (heightMap:HeightMap, playerDefs:Array<PlayerDef>)
         }));
 
     return {
+        isGameOver: false,
         elapsedTime: 0,
         heightMap,
         players: players,
@@ -95,6 +96,7 @@ export interface KeyboardMap {
 };
 
 export interface GameData {
+    isGameOver: boolean,
     elapsedTime: 0,
     heightMap: HeightMap,
     players: Array<Player>,

@@ -1,9 +1,11 @@
 import { HeightMap, Player, PLAYER_WIDTH } from "./defs";
+import { p } from "./physics";
 
 export const placePlayersOnGround = (players:Array<Player>, heightMap:HeightMap, offsetX:number) => {
     let list = [...players].sort((p1, p2) => p2.score - p1.score);
     list.forEach((player, i) => {
-        player.pos.x = player.pos.x + offsetX + i*PLAYER_WIDTH;
+        player.vel = p(0, 0);
+        player.pos.x = offsetX + i*PLAYER_WIDTH*1.3;
         player.pos.y = heightMap.get(player.pos.x);
     })
 };

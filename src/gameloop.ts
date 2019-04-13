@@ -22,7 +22,6 @@ export const GameLoop = (updateGameState:(dt:number, gameData:GameData)=>void ,u
 
     const start = (g:GameData) => {
         gameData = g;
-        //keyboard.onKeyDown()
         previousTime = Date.now();
         onFrame();
     };

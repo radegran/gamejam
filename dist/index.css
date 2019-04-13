@@ -12,6 +12,59 @@ body {
     background-position: center;
 }
 
+.gameResults {
+    transform: translate(30px, 0) skewX(-45deg);
+    opacity: 0;
+    animation: 
+        appear 0.5s ease forwards,
+        enlarge 0.5s ease forwards 0.5s;
+}
+
+.roundResults {
+    transform: translate(30px, 0) skewX(-45deg);
+    opacity: 0;
+    animation: 
+        appear 0.5s ease forwards,
+        moveleft 2s linear forwards 0.5s,
+        disappear 0.5s ease forwards 2.5s;
+}
+
+@keyframes appear {
+    100% {
+        transform: translate(1px, 0) skewX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes enlarge {
+    0% {
+        transform: translate(1px, 0) scale(1);
+    }
+    100% {
+        transform: translate(1px, 0) scale(2);
+    }
+}
+
+@keyframes moveleft {
+    0% {
+        transform: translate(1px, 0);
+    }
+    100% {
+        transform: translate(-1px, 0);
+    }
+}
+
+@keyframes disappear {
+    0% {
+        transform: translate(-1px, 0);
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-30px, 0) skewX(45deg);
+    }
+}
+
 .selectPlayers {
     position: absolute;
     top: 0;

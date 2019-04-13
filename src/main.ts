@@ -1,7 +1,7 @@
 import { Editor } from "./editor";
 import { createKeyboardInput, bindPlayerKeyboardInput } from "./keyboardinput";
 import { GameLoop } from "./gameloop";
-import { createGameData, createLayers } from "./defs";
+import { createGameData, createLayers, GameData, HeightMap } from "./defs";
 import { createViewPort } from "./viewport";
 import { createPathDrawer } from "./editor-graphics";
 import { createHeightMap, placePlayersOnGround } from "./heightmap";
@@ -9,7 +9,7 @@ import { stepState } from "./physics";
 import SVG from "svgjs";
 import { test } from "./test";
 import { createView } from "./view";
-import { loadSvg, loadLevelJson } from "./util";
+import { loadSvg, loadLevelJson, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
 import { welcomeScreen, selectPlayers, createPlayerDefinitions } from "./welcome";
 
 async function startGame(levelname:string) {
@@ -26,7 +26,6 @@ async function startGame(levelname:string) {
     let s = SVG(document.getElementById(svgId));
 
     let heightMap = await loadLevelJson("levels/" + levelname + ".json");
-    let gameData = createGameData(heightMap, playerDefs);
     
     let layers = createLayers();
     let viewPort = createViewPort(s, layers);
@@ -35,12 +34,42 @@ async function startGame(levelname:string) {
     let gameLoop = GameLoop(stepState, view.update);
     
     let keyboardinput = createKeyboardInput();
-    bindPlayerKeyboardInput(gameData.players, playerDefs, keyboardinput);
-    view.setup(gameData.players);
+    let gameData:GameData;
+
+    const RUN = () => {
+        gameData = createGameData(heightMap, playerDefs);
+        bindPlayerKeyboardInput(gameData.players, playerDefs, keyboardinput);
+        view.setup(gameData.players);
+        placePlayersOnGround(gameData.players, heightMap, 1);
+        gameLoop.start(gameData);
+    };
+
+    RUN();
     
-    placePlayersOnGround(gameData.players, heightMap, 1);
-    gameLoop.start(gameData);
+    let k = createKeyboardInput();
+    k.onKeyDown(32, () => {   
+        if (tryRestartGame(gameData)) {
+            view.teardown();
+            gameLoop.stop();
+
+            RUN();
+        }
+    });
+
 };
+
+const tryRestartGame = (gameData:GameData) => {
+    if (gameData.isGameOver && timeSinceOnlyOnPlayerStillInTheGame(gameData) > 3000) {
+        gameData.isGameOver = false;
+        gameData.elapsedTime = 0;
+        gameData.players.forEach(p => {
+            p.score = 0;
+            p.droppedOutTime = -1;
+        });
+        return true;
+    }
+    return false;
+}
 
 const startEditMode = () => {
     let svgId = "mainsvg";

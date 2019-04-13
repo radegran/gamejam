@@ -40,6 +40,13 @@ export const timeSinceOnlyOnPlayerStillInTheGame = (gameData:GameData) => {
     let playersStillInTheGame = 0;
     let timeForLastPlayerDroppedOut = 0; 
     let elapsedTime = gameData.elapsedTime;
+    if (elapsedTime < 2000) {
+        return 0;
+    }
+
+    if (gameData.players.length === 1) {
+        return 0;
+    }
 
     gameData.players.forEach(p => {
         let droppedOutTime = p.droppedOutTime;
@@ -51,4 +58,10 @@ export const timeSinceOnlyOnPlayerStillInTheGame = (gameData:GameData) => {
     });
 
     return playersStillInTheGame === 1 ? (elapsedTime - timeForLastPlayerDroppedOut) : 0
+};
+
+export const playersSortByRoundWinner = (players:Array<Player>) => {
+    let playersCopy = [...players].sort((p1, p2) =>  p2.droppedOutTime - p1.droppedOutTime);
+    let winner = playersCopy.pop();
+    return [winner].concat(playersCopy);
 };

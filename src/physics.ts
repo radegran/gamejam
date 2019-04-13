@@ -1,5 +1,6 @@
 import { GameData, Point, GRAVITY, PLAYER_HEIGHT, Player, HeightMap, PLAYER_WIDTH, VIEWPORT_WIDTH } from "./defs";
-import { isStillInTheGame, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
+import { isStillInTheGame, timeSinceOnlyOnPlayerStillInTheGame, playersSortByRoundWinner } from "./util";
+import { placePlayersOnGround } from "./heightmap";
 
 const vecToCenter = (player:Player) => {
     return scale(p(-Math.sin(player.angle), -Math.cos(player.angle)), PLAYER_HEIGHT/2);
@@ -140,7 +141,8 @@ export const stepState = (dt:number, gameData:GameData) => {
     let f = gameData.camFocus;
     remainingPlayers.forEach(p => {
         if (p.accentColor === playerLead.accentColor) {
-            return;        }
+            return;
+        }
 
         if (p.pos.x < f.x - 0.9*VIEWPORT_WIDTH/2 ||
             p.pos.y > f.y + 0.9*VIEWPORT_WIDTH/2) {
@@ -148,10 +150,28 @@ export const stepState = (dt:number, gameData:GameData) => {
 
                 if (remainingPlayers.length == 2) {
                     // We have a winner
-                    //remainingPlayers.find(isStillInTheGame).roundPlacement = 1;
+                    let playersCopy = playersSortByRoundWinner(gameData.players);
+                    playersCopy.forEach((p, i) => {
+                        p.score = p.score + playersCopy.length - i - 1;
+                        if (p.score >= 10) {
+                            gameData.isGameOver = true;
+                        }
+                    });
                 }
             }
     });
+
+    if (remainingPlayers.length === 1) {
+        if (timeSinceOnlyOnPlayerStillInTheGame(gameData) > 3000) {
+            // Round is done, scores have been shown!
+            
+            if (!gameData.isGameOver) {
+                gameData.players.forEach(p => p.droppedOutTime = -1);
+                placePlayersOnGround(gameData.players, gameData.heightMap, gameData.camFocus.x);
+            }
+
+        }
+    }
 };
 
 const magnitude = (vec:Point) => {
