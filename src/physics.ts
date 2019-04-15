@@ -1,6 +1,6 @@
 import { GameData, Point, GRAVITY, PLAYER_HEIGHT, Player, HeightMap, PLAYER_WIDTH, VIEWPORT_WIDTH } from "./defs";
 import { isStillInTheGame, timeSinceOnlyOnPlayerStillInTheGame, playersSortByRoundWinner } from "./util";
-import { placePlayersOnGround } from "./heightmap";
+import { resetPlayersOnGround } from "./heightmap";
 
 const vecToCenter = (player:Player) => {
     return scale(p(-Math.sin(player.angle), -Math.cos(player.angle)), PLAYER_HEIGHT/2);
@@ -27,11 +27,11 @@ const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap) => {
     player.angleVel = Math.max(-10, Math.min(10, player.angleVel));
 
     let angleDiff = player.angleVel * dt/1000;
-    let centerBeforeAngleChange = vecToCenter(player);
+    let toCenterBeforeAngleChange = vecToCenter(player);
     player.angle += angleDiff;
-    let centerAfterAngleChange = vecToCenter(player);
+    let toCenterAfterAngleChange = vecToCenter(player);
 
-    player.pos = add(player.pos, sub(centerBeforeAngleChange, centerAfterAngleChange));
+    player.pos = add(player.pos, sub(toCenterBeforeAngleChange, toCenterAfterAngleChange));
     
     let pos = player.pos;
     let vel = player.vel;
@@ -45,29 +45,50 @@ const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap) => {
     let slope = (heightMap.get(pos.x + delta/2) - heightMap.get(pos.x - delta/2))/delta;
     let groundNormal = p(slope, -delta);
         
+    const posCenter = add(pos, toCenterAfterAngleChange);
+    const centerThroughGround = posCenter.y - heightMap.get(posCenter.y);
     const throughGround = pos.y - heightMap.get(pos.x);
-    if (throughGround > -0.1 && player.input.jump) {
-        player.vel = add(vel, scale(norm(groundNormal), 1));
-    } 
-    else if (throughGround > 0) {
+
+    if (throughGround >= 0) {
         pos.y -= throughGround;
         
         let groundTangentUnit = norm(p(delta, slope));
         let movingTowardsGround = dot(vel, groundNormal) < 0;
         
+        let flip360Forward = false;
+        let tangentAngle = -Math.atan(slope/delta);
+
         if (movingTowardsGround) {
             // Tangentize velocity
             let newVel = scale(groundTangentUnit, dot(vel, groundTangentUnit));
             vel.x = newVel.x;
             vel.y = newVel.y;
 
-            // Tangentize angle
-            player.angle = -Math.atan(slope/delta);
+            let airTimeRevolutions = Math.round((player.angle - tangentAngle) / (2*Math.PI));
+            flip360Forward = airTimeRevolutions === -1;
+            player.angle += -airTimeRevolutions * 2*Math.PI;
+        }
+
+        if (player.input.jump) {
+            let jumpVec = scale(norm(groundNormal), 5);
+            let slowDownVec = scale(groundTangentUnit, -1/4);
+            player.vel = add(player.vel, add(jumpVec, slowDownVec));            
+        } else {
+            // Tangentize angle when not jumping
+            let W = 5;
+            player.angle = 1/W * tangentAngle + (W-1)/W * player.angle;
             player.angleVel = 0;
+        }
+
+        if (player.input.rotateRight) {
+            player.vel = add(player.vel, p(2*dt/1000, 0));
+        }
+        if (player.input.rotateLeft) {
+            player.vel = add(player.vel, p(-2*dt/1000, 0));
         }
     }
     
-    player.touchesGround = throughGround > -0.1;
+    player.touchesGround = throughGround >= 0;
 };
 
 const proj = (vec:Point, onVec:Point) => scale(onVec, dot(vec, onVec));
@@ -166,10 +187,8 @@ export const stepState = (dt:number, gameData:GameData) => {
             // Round is done, scores have been shown!
             
             if (!gameData.isGameOver) {
-                gameData.players.forEach(p => p.droppedOutTime = -1);
-                placePlayersOnGround(gameData.players, gameData.heightMap, gameData.camFocus.x);
+                resetPlayersOnGround(gameData.players, gameData.heightMap, gameData.camFocus.x);
             }
-
         }
     }
 };

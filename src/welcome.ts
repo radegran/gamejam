@@ -81,7 +81,6 @@ export const selectPlayers = async (s:SVG.Doc, resources:Resources) => {
     };
 
     playerDefs.forEach((p, i) => {
-
         let g = s.group()
             .translate(-3 + i*6/3, PLAYER_HEIGHT/2)
             .opacity(0.3)

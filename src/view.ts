@@ -76,7 +76,6 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
             let g = playerSvgGroups[i];
             g.rotate(180 * -player.angle / Math.PI);
             g.translate(playerPos.x, playerPos.y);
-            g.style("color", player.accentColor);
         });
 
         applyTransition(previousCamFocus, gameData.camFocus);
@@ -102,8 +101,9 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         let canvasWidth = s.node.getBoundingClientRect().width;
         applyTransition = setupPartitions(canvasWidth, viewPort.width(), layers, s);
 
-        playerSvgGroups = players.map(_ => {
+        playerSvgGroups = players.map(player => {
             let g = (s.select("#player-layer").get(0) as SVG.G).group();
+            g.style("color", player.accentColor);
             loadPlayerSvg(g, resources);
             return g;
         });    

@@ -4,7 +4,7 @@ import { GameLoop } from "./gameloop";
 import { createGameData, createLayers, GameData, Resources, defineResources } from "./defs";
 import { createViewPort } from "./viewport";
 import { createPathDrawer } from "./editor-graphics";
-import { createHeightMap, placePlayersOnGround } from "./heightmap";
+import { createHeightMap, resetPlayersOnGround } from "./heightmap";
 import { stepState } from "./physics";
 import SVG from "svgjs";
 import { test } from "./test";
@@ -40,7 +40,7 @@ async function startGame(resources:Resources) {
         gameData = createGameData(heightMap, playerDefs);
         bindPlayerKeyboardInput(gameData.players, playerDefs, keyboardinput);
         view.setup(gameData.players);
-        placePlayersOnGround(gameData.players, heightMap, 1);
+        resetPlayersOnGround(gameData.players, heightMap, 1);
         gameLoop.start(gameData);
     };
 
@@ -62,10 +62,7 @@ const tryRestartGame = (gameData:GameData) => {
     if (gameData.isGameOver && timeSinceOnlyOnPlayerStillInTheGame(gameData) > 3000) {
         gameData.isGameOver = false;
         gameData.elapsedTime = 0;
-        gameData.players.forEach(p => {
-            p.score = 0;
-            p.droppedOutTime = -1;
-        });
+        gameData.players.forEach(p => p.score = 0);
         return true;
     }
     return false;
@@ -104,7 +101,7 @@ const startEditMode = (resources:Resources) => {
             let gameData = createGameData(heightMap, defaultPlayers);
             view.setup(gameData.players);
             
-            placePlayersOnGround(gameData.players, heightMap, 1);
+            resetPlayersOnGround(gameData.players, heightMap, 1);
             bindPlayerKeyboardInput(gameData.players, defaultPlayers, temporaryKeyboardInput);
             gameLoop.start(gameData);
         }
