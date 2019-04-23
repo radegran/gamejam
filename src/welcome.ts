@@ -78,6 +78,8 @@ export const story = async (storyname:string) => {
 };
 
 export const selectPlayers = async (s:SVG.Doc, resources:Resources) => {
+    let story = makeDiv("selectPlayers");
+
     let playerDefs = createPlayerDefinitions();
     let participatingPlayers = new Set<PlayerDef>();
     let keyBoard = createKeyboardInput();
@@ -113,5 +115,6 @@ export const selectPlayers = async (s:SVG.Doc, resources:Resources) => {
 
     keyBoard.off();
     toCleanup.forEach(elem => elem.remove());
+    story.remove();
     return Array.from(participatingPlayers.values());
 };
