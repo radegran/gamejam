@@ -67,6 +67,16 @@ export const welcomeScreen = async (resources:Resources) => {
     welcomeDiv.remove();
 };
 
+export const story = async (storyname:string) => {
+    let story = makeDiv(storyname);
+    let keyBoard = createKeyboardInput();
+    
+    await new Promise(resolve => keyBoard.onKeyDown(32, resolve));
+
+    keyBoard.off();
+    story.remove();
+};
+
 export const selectPlayers = async (s:SVG.Doc, resources:Resources) => {
     let playerDefs = createPlayerDefinitions();
     let participatingPlayers = new Set<PlayerDef>();

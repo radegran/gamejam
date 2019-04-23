@@ -10,7 +10,7 @@ import SVG from "svgjs";
 import { test } from "./test";
 import { createView } from "./view";
 import { loadSvg, loadLevelJson, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
-import { welcomeScreen, selectPlayers, createPlayerDefinitions } from "./welcome";
+import { welcomeScreen, selectPlayers, createPlayerDefinitions, story } from "./welcome";
 
 async function startGame(resources:Resources) {
 
@@ -18,6 +18,7 @@ async function startGame(resources:Resources) {
     let svgElement = document.getElementById(svgId);
 
     await welcomeScreen(resources);
+    await story("story-1");
 
     let playerDefs = await selectPlayers(SVG(svgElement), resources); 
 
