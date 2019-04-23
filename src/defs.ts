@@ -12,24 +12,32 @@ export interface PlayerDef {
     accentColor: string
 }
 
+export type Player = ReturnType<typeof createPlayer>;
+
+export const createPlayer = () => ({
+    score: 0,
+    droppedOutTime: -1,
+    accentColor: "",
+    pos: {x:0, y:0},
+    vel: {x:0, y:0},
+    angle: 0,
+    angleVel: 0,
+    touchesGround: false,
+    hasJumped: false,
+    input: {
+        rotateLeft: false,
+        rotateRight: false,
+        jump: false
+    }
+});
+
 export const createGameData = (heightMap:HeightMap, playerDefs:Array<PlayerDef>):GameData => {
     
-    let players:Array<Player> = playerDefs.map(def => (
-        {
-            score: 0,
-            droppedOutTime: -1,
-            accentColor: def.accentColor,
-            pos: {x:0, y:0},
-            vel: {x:0, y:0},
-            angle: 0,
-            angleVel: 0,
-            touchesGround: false,
-            input: {
-                rotateLeft: false,
-                rotateRight: false,
-                jump: false
-            }
-        }));
+    let players:Array<Player> = playerDefs.map(def => {
+        let p = createPlayer();
+        p.accentColor = def.accentColor;
+        return p;
+    });
 
     return {
         isGameOver: false,
@@ -81,22 +89,6 @@ export type Resources = ReturnType<typeof defineResources>;
 
 export interface PointCallback {
     (p:Point): void
-}
-
-export interface Player {
-    score: number,
-    droppedOutTime: number,
-    accentColor: string,
-    pos: Point,
-    vel: Point,
-    angle: number,
-    angleVel: number,
-    touchesGround: boolean;
-    input: {
-        rotateRight: boolean,
-        rotateLeft: boolean,
-        jump: boolean
-    }
 }
 
 export interface KeyboardMap {

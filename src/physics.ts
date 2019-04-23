@@ -22,6 +22,94 @@ const getAngularAcceleration = (player:Player) => {
 
 const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap) => {
 
+    let pos = player.pos;
+    let vel = player.vel;
+    const input = player.input;
+    
+    // step physics
+    vel.y += GRAVITY * dt/1000;    
+    pos = add(pos, scale(vel, dt/1000));
+
+    // env
+    const delta = 1;
+    const slope = (heightMap.get(pos.x + delta/2) - heightMap.get(pos.x - delta/2))/delta;
+    const groundNormal = p(slope, -delta);
+    const groundTangentUnit = norm(p(delta, slope));
+    const tangentAngle = -Math.atan(slope/delta);
+    const throughGround = pos.y - heightMap.get(pos.x);
+    
+    // collide ground
+    if (throughGround >= 0) {
+        player.hasJumped = false;
+        pos.y -= throughGround;
+                
+        let movingTowardsGround = dot(vel, groundNormal) < 0;
+        if (movingTowardsGround) {        
+            // Tangentize velocity
+            let newVel = scale(groundTangentUnit, dot(vel, groundTangentUnit));
+            vel.x = newVel.x;
+            vel.y = newVel.y;
+        }
+
+        if (input.jump) {
+            player.hasJumped = true;
+            let jumpVec = scale(norm(groundNormal), 5);
+            let slowDownVec = scale(groundTangentUnit, -1/4);
+            vel = add(vel, add(jumpVec, slowDownVec));            
+        } else {
+            // Tangentize angle when not jumping
+            let W = 5;
+            player.angle = 1/W * tangentAngle + (W-1)/W * player.angle;
+            player.angleVel = 0;
+        }
+    } else {
+        // air time!
+        if (player.hasJumped) {
+            let targetAngle = input.rotateLeft ? Math.PI/6 :
+            input.rotateRight ? -Math.PI/6 :
+            0;
+            
+            player.angleVel = 10*(targetAngle - player.angle);
+            
+            let angleDiff = player.angleVel * dt/1000;
+            let toCenterBeforeAngleChange = vecToCenter(player);
+            player.angle += angleDiff;
+            let toCenterAfterAngleChange = vecToCenter(player);
+        
+            pos = add(pos, sub(toCenterBeforeAngleChange, toCenterAfterAngleChange));
+        }
+    }
+    
+    acceleratePlayerRightLeft(player, throughGround, groundTangentUnit, dt);
+
+    player.touchesGround = throughGround >= 0;
+    player.pos = pos;
+    player.vel = vel;
+};
+
+const acceleratePlayerRightLeft = (player:Player, throughGround:number, groundTangentUnit:Point, dt:number) => {
+
+    // 0 -> go right
+    // 1 -> go tangent
+    let W = Math.max(-1, Math.min(0, throughGround)) + 1;
+
+    let direction = add(scale(groundTangentUnit, W),
+                        scale(p(1, 0), (1 - W)));
+
+    let maxThrottle = 10;
+    let arrowAcc = 10;
+    if (player.input.rotateRight) {
+        player.vel.x += Math.max(0, Math.sign(maxThrottle - player.vel.x)) * direction.x * arrowAcc*dt/1000;
+        player.vel.y += Math.max(0, Math.sign(maxThrottle - player.vel.y)) * direction.y * arrowAcc*dt/1000;
+    }
+    if (player.input.rotateLeft) {
+        player.vel.x -= Math.max(0, Math.sign(maxThrottle + player.vel.x)) * direction.x * arrowAcc*dt/1000;
+        player.vel.y -= Math.max(0, Math.sign(maxThrottle + player.vel.y)) * direction.y * arrowAcc*dt/1000;
+    }
+};
+
+const stepPlayerState_orig = (dt:number, player:Player, heightMap:HeightMap) => {
+
     let angleAcc = getAngularAcceleration(player);
     player.angleVel += 20*angleAcc * dt/1000;
     player.angleVel = Math.max(-10, Math.min(10, player.angleVel));

@@ -1,6 +1,6 @@
 import { getPartitionLeftRight, Partition } from "./partitioning";
 import { createVerify } from "crypto";
-import { Point, Player } from "./defs";
+import { Point, Player, createPlayer } from "./defs";
 import { reflect, p, collidePlayerPair } from "./physics";
 
 const testPartitions = () => {
@@ -51,21 +51,9 @@ const testCollide = () => {
     };
 
     const makePlayer = (pos:Point, vel:Point) => {
-        let p:Player = {
-            droppedOutTime: 1e14,
-            accentColor:"a",
-            pos,
-            vel,
-            score: 0,
-            angle: 0,
-            angleVel: 0,
-            touchesGround: false,
-            input: {
-                rotateLeft: false,
-                rotateRight: false,
-                jump: false
-            }
-        }
+        let p = createPlayer();
+        p.pos = pos;
+        p.vel = vel;
         return p;
     };
 
