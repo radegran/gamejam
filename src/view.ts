@@ -1,6 +1,6 @@
 import { ViewPort } from "./viewport";
 import SVG from "svgjs";
-import { LayerDefinition, Point, GameData, PLAYER_HEIGHT, Player, VIEWPORT_WIDTH, PLAYER_WIDTH, Resources } from "./defs";
+import { LayerDefinition, Point, GameData, PLAYER_HEIGHT, Player, VIEWPORT_WIDTH, PLAYER_WIDTH, Resources, playerSvgs } from "./defs";
 import { setupPartitions } from "./partitioning";
 import { loadSvg, isStillInTheGame, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
 
@@ -24,7 +24,7 @@ const showRoundResults = (s:SVG.Doc, viewPort:ViewPort, players:Array<Player>, i
 
         players.forEach((p, i) => {
             let row = innerElem.group().translate(leftAlign, topAlign + i*rowHeight);
-            loadPlayerSvg(row.group().style("color", p.accentColor), resources);
+            loadPlayerSvg(row.group().style("color", p.accentColor), playerSvgs(resources)[i]);
 
             let points = row.group();
             for (var i = 0; i < 10; i++) {
@@ -101,10 +101,10 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         let canvasWidth = s.node.getBoundingClientRect().width;
         applyTransition = setupPartitions(canvasWidth, viewPort.width(), layers, s);
 
-        playerSvgGroups = players.map(player => {
+        playerSvgGroups = players.map((player, i) => {
             let g = (s.select("#player-layer").get(0) as SVG.G).group();
             g.style("color", player.accentColor);
-            loadPlayerSvg(g, resources);
+            loadPlayerSvg(g, playerSvgs(resources)[i]);
             return g;
         });    
     };
@@ -122,10 +122,27 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
     };
 };
 
-export const loadPlayerSvg = async (g:SVG.G, resouces:Resources) => {
-    let elem = (await loadSvg(resouces.playerSvg)).asElement();
+export const loadPlayerSvg = async (g:SVG.G, playerSvg:string) => {
+    let elem = (await loadSvg(playerSvg)).asElement();
     let elemText = elem.getElementsByTagName('g')[0].outerHTML;
-    g.svg(elemText);
+    let scaleG = g.group();
+    let translateG = scaleG.group();
+    translateG.svg(elemText);
     let bbox = g.bbox();
-    g.scale(PLAYER_HEIGHT/bbox.height, PLAYER_HEIGHT/bbox.height, 0, 0);
+    translateG.translate(-(bbox.x2 - bbox.width/2), -bbox.y2);
+    scaleG.scale(PLAYER_HEIGHT/bbox.height, 
+        PLAYER_HEIGHT/bbox.height, 
+        0, 
+        0);
 };
+
+// cx: 90.29594612121582
+// cy: 104.9392204284668
+// h: 138.38157653808594
+// height: 138.38157653808594
+// w: 122.54891204833984
+// width: 122.54891204833984
+// x: 29.0214900970459
+// x2: 151.57040214538574
+// y: 35.74843215942383
+// y2: 174.13000869750977

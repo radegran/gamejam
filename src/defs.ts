@@ -80,10 +80,20 @@ export interface Point {
 export const defineResources = (levelname:string) => {
     return {
         levelSvg: "levels/" + levelname + ".svg",
-        playerSvg: "player.svg",
+        player1Svg: "player-1.svg",
+        player2Svg: "player-2.svg",
+        player3Svg: "player-3.svg",
+        player4Svg: "player-4.svg",
         levelJson: "levels/" + levelname + ".json"
     };
 }
+
+export const playerSvgs = (resources:Resources) => [
+    resources.player1Svg,
+    resources.player2Svg,
+    resources.player3Svg,
+    resources.player4Svg
+]
 
 export type Resources = ReturnType<typeof defineResources>;
 

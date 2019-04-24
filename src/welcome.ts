@@ -1,5 +1,5 @@
 import { createKeyboardInput } from "./keyboardinput";
-import { PLAYER_HEIGHT, PlayerDef, Resources } from "./defs";
+import { PLAYER_HEIGHT, PlayerDef, Resources, playerSvgs } from "./defs";
 import SVG from "svgjs";
 import { loadPlayerSvg } from "./view";
 import { loadSvg, loadLevelJson } from "./util";
@@ -8,19 +8,19 @@ export const createPlayerDefinitions = ():Array<PlayerDef> => {
     let players = [
         {
             keyMap: {right: 90, left: 81, up: 83},
-            accentColor: "red"
+            accentColor: "#e46167"
         },
         {
             keyMap: {right: 78, left: 86, up: 71},
-            accentColor: "green"
+            accentColor: "#c47ec2"
         },
         {
             keyMap: {right: 39, left: 37, up: 38},
-            accentColor: "blue"
+            accentColor: "#48baec"
         },
         {
             keyMap: {right: 104, left: 98, up: 100},
-            accentColor: "yellow"
+            accentColor: "#78bc78"
         }
     ];
 
@@ -48,7 +48,9 @@ const preLoadResources = async (resources:Resources) => {
     };
 
     awaitParallel(async () => await loadSvg(resources.levelSvg));
-    awaitParallel(async () => await loadSvg(resources.playerSvg));
+    playerSvgs(resources).forEach(playerSvg => {
+        awaitParallel(async () => await loadSvg(playerSvg));
+    });
     awaitParallel(async () => await loadLevelJson(resources.levelJson));
 
     await Promise.all(ps);
@@ -94,10 +96,10 @@ export const selectPlayers = async (s:SVG.Doc, resources:Resources) => {
 
     playerDefs.forEach((p, i) => {
         let g = s.group()
-            .translate(-3 + i*6/3, PLAYER_HEIGHT/2)
+            .translate(-2.5 + i*5/3, PLAYER_HEIGHT/2)
             .opacity(0.3)
             .style("color", p.accentColor);
-        loadPlayerSvg(g, resources);
+        loadPlayerSvg(g, playerSvgs(resources)[i]);
         toCleanup.push(g);
 
         let action = participate(p, g);
