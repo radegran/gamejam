@@ -22,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -2869,7 +2869,8 @@
   </defs>
   <g
      id="g37228"
-     style="display:inline">
+     style="display:inline"
+     inkscape:label="background-layer">
     <g
        id="g28166">
       <g
