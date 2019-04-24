@@ -69,9 +69,9 @@ const preLoadResources = async (resources:Resources) => {
     var music = new Howl({
         src: resources.music,
         loop: true,
-        volume: 0.3
+        volume: 0.6
       });
-       
+      
       music.play();
 
     resources.sounds = createSounds({

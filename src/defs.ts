@@ -99,6 +99,7 @@ export const createSounds = (catalog?:SoundCatalog) => {
     }
     
     function collide() {
+        catalog.collide.volume(0.6);
         catalog.collide.play();
     }
 
