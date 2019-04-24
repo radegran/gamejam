@@ -84,6 +84,7 @@ export const createSounds = (catalog?:SoundCatalog) => {
 
     function startGame() {
         catalog.pickninja0.play();
+        catalog.gameover.stop();
     }
 
     function gameover() {
