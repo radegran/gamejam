@@ -59,7 +59,7 @@ const testCollide = () => {
 
     let p1 = makePlayer(p(0, 0), p(1, 0));
     let p2 = makePlayer(p(0.1, 0), p(0, 0));
-    collidePlayerPair(p1, p2);
+    //collidePlayerPair(p1, p2);
     verifyEqual(p1.vel, p(0, 0));
     verifyEqual(p2.vel, p(1, 0));
 };

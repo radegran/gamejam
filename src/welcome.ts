@@ -1,8 +1,9 @@
 import { createKeyboardInput } from "./keyboardinput";
-import { PLAYER_HEIGHT, PlayerDef, Resources, playerSvgs } from "./defs";
+import { PLAYER_HEIGHT, PlayerDef, Resources, playerSvgs, createSounds } from "./defs";
 import SVG from "svgjs";
 import { loadPlayerSvg } from "./view";
 import { loadSvg, loadLevelJson } from "./util";
+import howler from "howler";
 
 export const createPlayerDefinitions = ():Array<PlayerDef> => {
     let players = [
@@ -35,8 +36,6 @@ const makeDiv = (className:string) => {
     return div;
 };
 
-
-
 const preLoadResources = async (resources:Resources) => {
     let ps:Array<Promise<void>> = [];
 
@@ -47,11 +46,44 @@ const preLoadResources = async (resources:Resources) => {
         }));
     };
 
+    const awaitSound = async (url:string) => {
+        return await new Promise<Howl>(res => {
+            let howl = new Howl({
+                src: url,
+                onload: loaded
+              });
+
+            function loaded() {
+                res(howl);
+            }
+        });
+    }
+
     awaitParallel(async () => await loadSvg(resources.levelSvg));
     playerSvgs(resources).forEach(playerSvg => {
         awaitParallel(async () => await loadSvg(playerSvg));
     });
     awaitParallel(async () => await loadLevelJson(resources.levelJson));
+
+    // //sounds
+    var music = new Howl({
+        src: resources.music,
+        loop: true,
+        volume: 0.3
+      });
+       
+      music.play();
+
+    resources.sounds = createSounds({
+        music,
+        collide: await awaitSound(resources.collide),
+        jump: await awaitSound(resources.jump),
+        pickninja1: await awaitSound(resources.pickninja1),
+        pickninja0: await awaitSound(resources.pickninja0),
+        gameover: await awaitSound(resources.gameover),
+        roundover: await awaitSound(resources.roundover),
+        land: await awaitSound(resources.land)
+    })
 
     await Promise.all(ps);
 }
@@ -90,6 +122,9 @@ export const selectPlayers = async (s:SVG.Doc, resources:Resources) => {
     let toCleanup:Array<SVG.G> = [];
 
     const participate = (p:PlayerDef, g:SVG.G) => () => {
+        if (!participatingPlayers.has(p)) {
+            resources.sounds.selectPlayer();
+        }
         participatingPlayers.add(p);
         g.opacity(1);
     };

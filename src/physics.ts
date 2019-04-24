@@ -1,4 +1,4 @@
-import { GameData, Point, GRAVITY, PLAYER_HEIGHT, Player, HeightMap, PLAYER_WIDTH, VIEWPORT_WIDTH } from "./defs";
+import { GameData, Point, GRAVITY, PLAYER_HEIGHT, Player, HeightMap, PLAYER_WIDTH, VIEWPORT_WIDTH, Resources } from "./defs";
 import { isStillInTheGame, timeSinceOnlyOnPlayerStillInTheGame, playersSortByRoundWinner } from "./util";
 import { resetPlayersOnGround } from "./heightmap";
 
@@ -20,7 +20,7 @@ const getAngularAcceleration = (player:Player) => {
     return -Math.sign(player.angleVel);
 };
 
-const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap) => {
+const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap, resources:Resources) => {
 
     let pos = player.pos;
     let vel = player.vel;
@@ -43,7 +43,9 @@ const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap) => {
         player.hasJumped = false;
         pos.y -= throughGround;
                 
-        let movingTowardsGround = dot(vel, groundNormal) < 0;
+        let velDotGroundNormal = dot(vel, groundNormal);
+        let movingTowardsGround = velDotGroundNormal < 0;
+        
         if (movingTowardsGround) {        
             // Tangentize velocity
             let newVel = scale(groundTangentUnit, dot(vel, groundTangentUnit));
@@ -52,6 +54,7 @@ const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap) => {
         }
 
         if (input.jump) {
+            resources.sounds.jump();
             player.hasJumped = true;
             let jumpVec = scale(norm(groundNormal), 5);
             let slowDownVec = scale(groundTangentUnit, -1/4);
@@ -189,13 +192,14 @@ export const reflect = (vec: Point, normal:Point) => {
     return result;
 };
 
-export const collidePlayerPair = (p1:Player, p2:Player) => {
+export const collidePlayerPair = (p1:Player, p2:Player, resources:Resources) => {
     let diff = sub(p2.pos, p1.pos);
     let dist = magnitude(diff);
     if (dist < PLAYER_WIDTH * 0.7) {
         let velDiff = sub(p1.vel, p2.vel);
         if (dot(velDiff, diff) > 0) {
             // collision!
+            resources.sounds.collide();
             let normDiff = scale(diff, 1/dist);
             p1.vel = add(p1.vel, reflect(velDiff, normDiff));
             p2.vel = sub(p2.vel, reflect(velDiff, normDiff));
@@ -203,12 +207,12 @@ export const collidePlayerPair = (p1:Player, p2:Player) => {
     }
 };
 
-const collidePlayers = (players:Array<Player>) => {
+const collidePlayers = (players:Array<Player>, resources:Resources) => {
     let numPlayers = players.length;
     players.forEach((p1, p1i) => {
         for (let p2i = p1i + 1; p2i < numPlayers; p2i++) {
             let p2 = players[p2i];
-            collidePlayerPair(p1, p2);
+            collidePlayerPair(p1, p2, resources);
         }
     });
 };
@@ -234,14 +238,14 @@ const calcPlayerLead = (players:Array<Player>) => {
     return lead;
 };
 
-export const stepState = (dt:number, gameData:GameData) => {
+export const stepState = (dt:number, gameData:GameData, resources:Resources) => {
     gameData.elapsedTime += dt;
 
     let remainingPlayers = gameData.players.filter(isStillInTheGame);
 
-    remainingPlayers.forEach(p => stepPlayerState(dt, p, gameData.heightMap));
+    remainingPlayers.forEach(p => stepPlayerState(dt, p, gameData.heightMap, resources));
 
-    collidePlayers(remainingPlayers);
+    collidePlayers(remainingPlayers, resources);
     
     let playerLead = calcPlayerLead(remainingPlayers);
 
@@ -264,8 +268,14 @@ export const stepState = (dt:number, gameData:GameData) => {
                         p.score = p.score + playersCopy.length - i - 1;
                         if (p.score >= 10) {
                             gameData.isGameOver = true;
-                        }
+                        } 
                     });
+
+                    if (gameData.isGameOver) {
+                        resources.sounds.gameover();
+                    } else {
+                        resources.sounds.roundover();
+                    }
                 }
             }
     });

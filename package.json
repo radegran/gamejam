@@ -7,14 +7,17 @@
     },
     "devDependencies": {},
     "dependencies": {
+        "@types/howler": "^2.1.0",
         "@types/jasmine": "^3.3.12",
         "@types/node": "^11.11.6",
+        "@types/soundjs": "^0.6.27",
+        "express": "^4.16.4",
+        "howler": "^2.1.2",
         "jasmine": "^3.1.0",
         "rollup": "^1.7.4",
         "rollup-plugin-typescript2": "^0.20.1",
+        "svgjs": "^2.6.2",
         "ts-node": "^8.0.3",
-        "typescript": "^3.3.4",
-        "express": "^4.16.4",
-        "svgjs": "^2.6.2"
+        "typescript": "^3.3.4"
     }
 }

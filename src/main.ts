@@ -32,7 +32,7 @@ async function startGame(resources:Resources) {
     let viewPort = createViewPort(s, layers);
     
     let view = createView(viewPort, s, layers, resources);
-    let gameLoop = GameLoop(stepState, view.update);
+    let gameLoop = GameLoop(stepState, view.update, resources);
     
     let keyboardinput = createKeyboardInput();
     let gameData:GameData;
@@ -43,6 +43,7 @@ async function startGame(resources:Resources) {
         view.setup(gameData.players);
         resetPlayersOnGround(gameData.players, heightMap, 1);
         gameLoop.start(gameData);
+        resources.sounds.startGame();
     };
 
     RUN();
@@ -86,7 +87,7 @@ const startEditMode = (resources:Resources) => {
 
     // Game
     let view = createView(viewPort, s, layers, resources);
-    let gameLoop = GameLoop(stepState, view.update);
+    let gameLoop = GameLoop(stepState, view.update, resources);
 
     let temporaryKeyboardInput = createKeyboardInput();
     // Toggle Game/Editor

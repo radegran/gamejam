@@ -1,7 +1,7 @@
 import { createKeyboardInput } from "./keyboardinput";
-import { GameData } from "./defs";
+import { GameData, Resources } from "./defs";
 
-export const GameLoop = (updateGameState:(dt:number, gameData:GameData)=>void ,updateGameView:(gameData:GameData)=>void) => {
+export const GameLoop = (updateGameState:(dt:number, gameData:GameData, resources:Resources)=>void ,updateGameView:(gameData:GameData)=>void, resources:Resources) => {
 
     const keyboard = createKeyboardInput();
     const TIME_STEP = 10; 
@@ -13,7 +13,7 @@ export const GameLoop = (updateGameState:(dt:number, gameData:GameData)=>void ,u
         let now = Date.now();
         while (previousTime + TIME_STEP < now) {
             previousTime += TIME_STEP;
-            updateGameState(TIME_STEP, gameData);
+            updateGameState(TIME_STEP, gameData, resources);
         }
 
         updateGameView(gameData);

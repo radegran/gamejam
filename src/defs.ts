@@ -77,6 +77,48 @@ export interface Point {
     y:number
 }
 
+export const createSounds = (catalog?:SoundCatalog) => {
+    function selectPlayer() {
+        catalog.pickninja1.play();
+    }
+
+    function startGame() {
+        catalog.pickninja0.play();
+    }
+
+    function gameover() {
+        catalog.gameover.play();
+    }
+
+    function jump() {
+        catalog.jump.play();
+    }
+    
+    function land() {
+        catalog.land.play();
+    }
+    
+    function collide() {
+        catalog.collide.play();
+    }
+
+    function roundover() {
+        catalog.roundover.play();
+    }
+
+    return {
+        selectPlayer,
+        startGame,
+        gameover,
+        roundover,
+        jump,
+        collide,
+        land
+    }
+};
+
+export type Sound = ReturnType<typeof createSounds>;
+
 export const defineResources = (levelname:string) => {
     return {
         levelSvg: "levels/" + levelname + ".svg",
@@ -84,8 +126,28 @@ export const defineResources = (levelname:string) => {
         player2Svg: "player-2.svg",
         player3Svg: "player-3.svg",
         player4Svg: "player-4.svg",
-        levelJson: "levels/" + levelname + ".json"
+        levelJson: "levels/" + levelname + ".json",
+        music: "music.mp3",
+        collide: "collide.mp3",
+        gameover: "gameover.mp3",
+        jump: "jump.mp3",
+        land: "land.mp3",
+        pickninja0: "pickninja0.mp3",
+        pickninja1: "pickninja1.mp3",
+        roundover: "roundover.mp3",
+        sounds: createSounds()
     };
+}
+
+export interface SoundCatalog {
+    music: Howl,
+    collide: Howl,
+    gameover: Howl,
+    jump: Howl,
+    land: Howl,
+    pickninja0: Howl,
+    pickninja1: Howl,
+    roundover: Howl
 }
 
 export const playerSvgs = (resources:Resources) => [
