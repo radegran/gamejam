@@ -25,6 +25,8 @@ async function startGame(resources:Resources) {
 
     let loadedSvg = (await loadSvg(resources.levelSvg)).asElement();
     svgElement.replaceWith(loadedSvg);
+    svgElement = document.getElementById(svgId);
+    svgElement.style.opacity = "0";
     let s = SVG(document.getElementById(svgId));
 
     let heightMap = await loadLevelJson(resources.levelJson);
@@ -45,6 +47,7 @@ async function startGame(resources:Resources) {
         resetPlayersOnGround(gameData.players, heightMap, 1);
         gameLoop.start(gameData);
         resources.sounds.startGame();
+        svgElement.style.opacity = "1";
     };
 
     RUN();
