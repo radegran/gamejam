@@ -96,12 +96,13 @@ export const createSounds = (catalog?:SoundCatalog) => {
     }
     
     function land() {
-        catalog.land.play();
+        catalog.collide.volume(0.6);
+        catalog.collide.play();
     }
     
     function collide() {
-        catalog.collide.volume(0.6);
-        catalog.collide.play();
+        catalog.land.volume(0.9);
+        catalog.land.play();
     }
 
     function roundover() {

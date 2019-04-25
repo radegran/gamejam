@@ -43,10 +43,13 @@ const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap, resource
         player.hasJumped = false;
         pos.y -= throughGround;
                 
-        let velDotGroundNormal = dot(vel, groundNormal);
+        let velDotGroundNormal = dot(norm(vel), groundNormal);
         let movingTowardsGround = velDotGroundNormal < 0;
         
-        if (movingTowardsGround) {        
+        if (movingTowardsGround) {       
+            if (velDotGroundNormal < -0.7 && magnitude(vel) > 0.2) {
+                resources.sounds.land();
+            } 
             // Tangentize velocity
             let newVel = scale(groundTangentUnit, dot(vel, groundTangentUnit));
             vel.x = newVel.x;
@@ -99,8 +102,8 @@ const acceleratePlayerRightLeft = (player:Player, throughGround:number, groundTa
     let direction = add(scale(groundTangentUnit, W),
                         scale(p(1, 0), (1 - W)));
 
-    let maxThrottle = 10;
-    let arrowAcc = 10;
+    let maxThrottle = 15;
+    let arrowAcc = 4;
     if (player.input.rotateRight) {
         player.vel.x += Math.max(0, Math.sign(maxThrottle - player.vel.x)) * direction.x * arrowAcc*dt/1000;
         player.vel.y += Math.max(0, Math.sign(maxThrottle - player.vel.y)) * direction.y * arrowAcc*dt/1000;
