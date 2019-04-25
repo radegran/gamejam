@@ -3,7 +3,6 @@ import { PLAYER_HEIGHT, PlayerDef, Resources, playerSvgs, createSounds } from ".
 import SVG from "svgjs";
 import { loadPlayerSvg } from "./view";
 import { loadSvg, loadLevelJson } from "./util";
-import howler from "howler";
 
 export const createPlayerDefinitions = ():Array<PlayerDef> => {
     let players = [
@@ -64,15 +63,15 @@ const preLoadResources = async (resources:Resources) => {
         awaitParallel(async () => await loadSvg(playerSvg));
     });
     awaitParallel(async () => await loadLevelJson(resources.levelJson));
+    awaitParallel(async () => await new Promise(res => setTimeout(res, 3000)));
 
     // //sounds
     var music = new Howl({
         src: resources.music,
         loop: true,
+        preload: true,
         volume: 0.6
       });
-      
-      music.play();
 
     resources.sounds = createSounds({
         music,
@@ -88,13 +87,24 @@ const preLoadResources = async (resources:Resources) => {
     await Promise.all(ps);
 }
 
-export const welcomeScreen = async (resources:Resources) => {
-    let welcomeDiv = makeDiv("welcome loading");
+export const logo = async (resources:Resources) => {
+    let welcomeDiv = makeDiv("logo");
+    let aligner = document.querySelector(".aligner");
+    aligner.className = "aligner black";
     let keyBoard = createKeyboardInput();
-
-    await preLoadResources(resources);
-    welcomeDiv.className = "welcome";
     
+    await preLoadResources(resources);
+
+    keyBoard.off();
+    aligner.className = "aligner";
+    welcomeDiv.remove();
+};
+
+export const welcomeScreen = async (resources:Resources) => {
+    let welcomeDiv = makeDiv("welcome");
+    let keyBoard = createKeyboardInput();
+    
+    resources.sounds.music();
     await new Promise(resolve => keyBoard.onKeyDown(32, resolve));
 
     keyBoard.off();

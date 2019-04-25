@@ -10,13 +10,14 @@ import SVG from "svgjs";
 import { test } from "./test";
 import { createView } from "./view";
 import { loadSvg, loadLevelJson, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
-import { welcomeScreen, selectPlayers, createPlayerDefinitions, story } from "./welcome";
+import { welcomeScreen, selectPlayers, createPlayerDefinitions, story, logo } from "./welcome";
 
 async function startGame(resources:Resources) {
 
     let svgId = "mainsvg";
     let svgElement = document.getElementById(svgId);
 
+    await logo(resources);
     await welcomeScreen(resources);
     await story("story-1");
 

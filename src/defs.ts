@@ -109,6 +109,10 @@ export const createSounds = (catalog?:SoundCatalog) => {
         catalog.roundover.play();
     }
 
+    function music() {
+        catalog.music.play();
+    }
+
     return {
         selectPlayer,
         startGame,
@@ -116,7 +120,8 @@ export const createSounds = (catalog?:SoundCatalog) => {
         roundover,
         jump,
         collide,
-        land
+        land,
+        music
     }
 };
 
