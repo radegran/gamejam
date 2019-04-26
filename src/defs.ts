@@ -23,7 +23,7 @@ export const createPlayer = () => ({
     angle: 0,
     angleVel: 0,
     touchesGround: false,
-    hasJumped: false,
+    hasJumped: 0,
     input: {
         rotateLeft: false,
         rotateRight: false,

@@ -25,6 +25,22 @@ const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap, resource
     let pos = player.pos;
     let vel = player.vel;
     const input = player.input;
+
+    const jump = () => {
+        input.jump = false;
+        let jumpingInAir = player.hasJumped > 0;
+        player.hasJumped++;
+       
+        resources.sounds.jump();
+        if  (jumpingInAir) {
+            console.log("airjump")
+            vel.y = -5;
+        } else {
+            let jumpVec = scale(norm(groundNormal), 5);
+            let slowDownVec = scale(groundTangentUnit, -1/4);
+            vel = add(vel, add(jumpVec, slowDownVec));
+        }
+    };
     
     // step physics
     vel.y += GRAVITY * dt/1000;    
@@ -40,7 +56,7 @@ const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap, resource
     
     // collide ground
     if (throughGround >= 0) {
-        player.hasJumped = false;
+        player.hasJumped = 0;
         pos.y -= throughGround;
                 
         let velDotGroundNormal = dot(norm(vel), groundNormal);
@@ -56,12 +72,8 @@ const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap, resource
             vel.y = newVel.y;
         }
 
-        if (input.jump) {
-            resources.sounds.jump();
-            player.hasJumped = true;
-            let jumpVec = scale(norm(groundNormal), 5);
-            let slowDownVec = scale(groundTangentUnit, -1/4);
-            vel = add(vel, add(jumpVec, slowDownVec));            
+        if (input.jump && player.hasJumped < 2) {
+            jump(); 
         } else {
             // Tangentize angle when not jumping
             let W = 5;
@@ -70,19 +82,24 @@ const stepPlayerState = (dt:number, player:Player, heightMap:HeightMap, resource
         }
     } else {
         // air time!
-        if (player.hasJumped) {
-            let targetAngle = input.rotateLeft ? Math.PI/6 :
-            input.rotateRight ? -Math.PI/6 :
-            0;
+        if (player.hasJumped > 0) {
+
+            if (input.jump && player.hasJumped < 2) {
+                jump(); 
+            } else {
+                let targetAngle = input.rotateLeft ? Math.PI/6 :
+                input.rotateRight ? -Math.PI/6 :
+                0;
+                
+                player.angleVel = 10*(targetAngle - player.angle);
+                
+                let angleDiff = player.angleVel * dt/1000;
+                let toCenterBeforeAngleChange = vecToCenter(player);
+                player.angle += angleDiff;
+                let toCenterAfterAngleChange = vecToCenter(player);
             
-            player.angleVel = 10*(targetAngle - player.angle);
-            
-            let angleDiff = player.angleVel * dt/1000;
-            let toCenterBeforeAngleChange = vecToCenter(player);
-            player.angle += angleDiff;
-            let toCenterAfterAngleChange = vecToCenter(player);
-        
-            pos = add(pos, sub(toCenterBeforeAngleChange, toCenterAfterAngleChange));
+                pos = add(pos, sub(toCenterBeforeAngleChange, toCenterAfterAngleChange));
+            }
         }
     }
     

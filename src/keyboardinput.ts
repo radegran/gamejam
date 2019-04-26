@@ -1,4 +1,4 @@
-import { Player, KeyboardMap, PlayerDef } from "./defs";
+import { Player, PlayerDef } from "./defs";
 
 type KeyboardInput = ReturnType<typeof createKeyboardInput>;
 
