@@ -17,16 +17,28 @@ export const bindPlayerKeyboardInput = (players:Array<Player>, playerDefs:Array<
 export function createKeyboardInput() {
     
     let addedHandlers = Array<any>();
+    let currentKeysDown:any = {};
 
     const onKeyDown = (keyCode:number, callback:()=>void) => {
 
-        let handler = (e:KeyboardEvent) => {
+        let handlerDown = (e:KeyboardEvent) => {
             if (e.keyCode === keyCode) {
+                if (currentKeysDown[keyCode]) {
+                    return;
+                }
+                currentKeysDown[keyCode] = true;
                 callback();
             }
         };
 
-        add("keydown", handler);
+        let handlerUp = (e:KeyboardEvent) => {
+            if (e.keyCode === keyCode) {
+                currentKeysDown[keyCode] = false;
+            }
+        };
+
+        add("keydown", handlerDown);
+        add("keyup", handlerUp);
     };
 
     const onKeyUp = (keyCode:number, callback:()=>void) => {
@@ -46,6 +58,7 @@ export function createKeyboardInput() {
     };
 
     const off = () => {
+        currentKeysDown = {};
         let kvp = addedHandlers.pop();
         while (!!kvp) {
             window.removeEventListener(kvp[0], kvp[1]);

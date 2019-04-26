@@ -43,7 +43,7 @@ async function startGame(resources:Resources) {
     const RUN = () => {
         gameData = createGameData(heightMap, playerDefs);
         bindPlayerKeyboardInput(gameData.players, playerDefs, keyboardinput);
-        view.setup(gameData.players);
+        view.setup(gameData);
         resetPlayersOnGround(gameData.players, heightMap, 1);
         gameLoop.start(gameData);
         resources.sounds.startGame();
@@ -105,9 +105,10 @@ const startEditMode = async (resources:Resources) => {
         }
         else {
             let gameData = createGameData(heightMap, defaultPlayers);
-            view.setup(gameData.players);
+            gameData.camFocus = viewPort.location();
+            view.setup(gameData);
             
-            resetPlayersOnGround(gameData.players, heightMap, 1);
+            resetPlayersOnGround(gameData.players, heightMap, gameData.camFocus.x);
             bindPlayerKeyboardInput(gameData.players, defaultPlayers, temporaryKeyboardInput);
             gameLoop.start(gameData);
         }

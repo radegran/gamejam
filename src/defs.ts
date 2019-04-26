@@ -78,38 +78,47 @@ export interface Point {
 }
 
 export const createSounds = (catalog?:SoundCatalog) => {
+
     function selectPlayer() {
+        if (!catalog) return;
         catalog.pickninja1.play();
     }
 
     function startGame() {
+        if (!catalog) return;
         catalog.pickninja0.play();
         catalog.gameover.stop();
     }
 
     function gameover() {
+        if (!catalog) return;
         catalog.gameover.play();
     }
 
     function jump() {
+        if (!catalog) return;
         catalog.jump.play();
     }
     
     function land() {
+        if (!catalog) return;
         catalog.collide.volume(0.6);
         catalog.collide.play();
     }
     
     function collide() {
+        if (!catalog) return;
         catalog.land.volume(0.9);
         catalog.land.play();
     }
 
     function roundover() {
+        if (!catalog) return;
         catalog.roundover.play();
     }
 
     function music() {
+        if (!catalog) return;
         catalog.music.play();
     }
 

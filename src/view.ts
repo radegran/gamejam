@@ -82,7 +82,7 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         previousCamFocus = gameData.camFocus;
     };
 
-    const reset = () => {
+    const reset = (location:Point) => {
         layers.forEach(layer => {
             let elem = s.select("#" + layer.id).get(0) as SVG.G;
             if (!!elem) {
@@ -91,17 +91,17 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         });
 
         viewPort.zoomLevel(1);
-        viewPort.location({x:0, y:0});
+        viewPort.location(location);
     };
 
-    const setup = async (players:Array<Player>) => {
-        reset();
+    const setup = async (gameData:GameData) => {
+        reset(gameData.camFocus);
 
         // Performance: This is about not rendering svg elements that are not visible
         let canvasWidth = s.node.getBoundingClientRect().width;
         applyTransition = setupPartitions(canvasWidth, viewPort.width(), layers, s);
 
-        playerSvgGroups = players.map((player, i) => {
+        playerSvgGroups = gameData.players.map((player, i) => {
             let g = (s.select("#player-layer").get(0) as SVG.G).group();
             g.style("color", player.accentColor);
             loadPlayerSvg(g, playerSvgs(resources)[i]);
