@@ -74,13 +74,13 @@ const tryRestartGame = (gameData:GameData) => {
     return false;
 }
 
-const startEditMode = (resources:Resources) => {
+const startEditMode = async (resources:Resources) => {
     let svgId = "mainsvg";
     let s = SVG(document.getElementById(svgId));
 
     let layers = createLayers();
 
-    let heightMap = createHeightMap(1500);
+    let heightMap = resources.levelJson ?  await loadLevelJson(resources.levelJson) : createHeightMap(1500);
     let viewPort = createViewPort(s, layers);
 
     let defaultPlayers = [createPlayerDefinitions()[2]]
@@ -116,22 +116,29 @@ const startEditMode = (resources:Resources) => {
     editor.toggle(true);
 };
 
+function getLevelNameOrDefault(fallback?:string) {
+
+    let ret = fallback;
+    if (window.location.href.search(/level=/) > -1) {
+        ret = window.location.href.split("level=")[1];
+    }
+
+    return ret;
+}
+
 function main() {
 
     test();
-    let href = window.location.href;
 
-    if (href.search(/\?edit/) > -1) {
+
+    if (window.location.href.search(/\?edit/) > -1) {
         // ENTER EDIT MODE
-        startEditMode(defineResources("none"));
+        let levelname = getLevelNameOrDefault("");
+        startEditMode(defineResources(levelname));
     }
     else {
         // ENTER GAMING MODE
-        let levelname = "level";
-        if (href.search(/\?level=/) > -1) {
-            levelname = href.split("?level=")[1];
-        }
-
+        let levelname = getLevelNameOrDefault("level");
         startGame(defineResources(levelname));
     }
 };

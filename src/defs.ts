@@ -134,7 +134,7 @@ export const defineResources = (levelname:string) => {
         player2Svg: "player-2.svg",
         player3Svg: "player-3.svg",
         player4Svg: "player-4.svg",
-        levelJson: "levels/" + levelname + ".json",
+        levelJson: levelname ? "levels/" + levelname + ".json" : "",
         music: "music.mp3",
         collide: "collide.mp3",
         gameover: "gameover.mp3",
