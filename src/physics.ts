@@ -283,8 +283,8 @@ export const stepState = (dt:number, gameData:GameData, resources:Resources) => 
             return;
         }
 
-        if (p.pos.x < f.x - 0.9*VIEWPORT_WIDTH/2 ||
-            p.pos.y > f.y + 0.9*VIEWPORT_WIDTH/2) {
+        if (p.pos.x < f.x - VIEWPORT_WIDTH/2 ||
+            p.pos.y > f.y + VIEWPORT_WIDTH/2) {
                 p.droppedOutTime = gameData.elapsedTime;
 
                 if (remainingPlayers.length == 2) {

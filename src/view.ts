@@ -68,12 +68,14 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
         }
         
         gameData.players.forEach((player, i) => {
+            let g = playerSvgGroups[i];
             if (!isStillInTheGame(player)) {
+                g.hide();
                 return;
             }
 
+            g.show();
             let playerPos = player.pos;
-            let g = playerSvgGroups[i];
             g.rotate(180 * -player.angle / Math.PI);
             g.translate(playerPos.x, playerPos.y);
         });
