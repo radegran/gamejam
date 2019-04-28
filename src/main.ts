@@ -12,12 +12,15 @@ import { createView } from "./view";
 import { loadSvg, loadLevelJson, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
 import { welcomeScreen, selectPlayers, createPlayerDefinitions, story, logo } from "./welcome";
 
-async function startGame(resources:Resources) {
+async function startFromLogo(resources:Resources) {
+    await logo(resources);
+    startFromWelcomeScreen(resources);
+};
 
+async function startFromWelcomeScreen(resources:Resources) {
     let svgId = "mainsvg";
     let svgElement = document.getElementById(svgId);
 
-    await logo(resources);
     await welcomeScreen(resources);
     await story("story-1");
 
@@ -40,38 +43,37 @@ async function startGame(resources:Resources) {
     let keyboardinput = createKeyboardInput();
     let gameData:GameData;
 
-    const RUN = () => {
-        gameData = createGameData(heightMap, playerDefs);
-        bindPlayerKeyboardInput(gameData.players, playerDefs, keyboardinput);
-        view.setup(gameData);
-        resetPlayersOnGround(gameData.players, heightMap, 1);
-        gameLoop.start(gameData);
-        resources.sounds.startGame();
-        svgElement.style.opacity = "1";
-    };
+    gameData = createGameData(heightMap, playerDefs);
+    bindPlayerKeyboardInput(gameData.players, playerDefs, keyboardinput);
+    view.setup(gameData);
+    resetPlayersOnGround(gameData.players, heightMap, 1);
+    gameLoop.start(gameData);
+    resources.sounds.startGame();
+    svgElement.style.opacity = "1";
 
-    RUN();
     
     let k = createKeyboardInput();
     k.onKeyDown(32, () => {   
-        if (tryRestartGame(gameData)) {
-            view.teardown();
-            gameLoop.stop();
-
-            RUN();
+        if (canRestartGame(gameData)) {
+            resetGame();
         }
     });
 
+    k.onKeyDown(27,resetGame);
+
+    function resetGame() {
+        view.teardown();
+        gameLoop.stop();
+        s.children().forEach(child => {
+            child.remove();
+        });
+        k.off();
+        startFromWelcomeScreen(resources);
+    };
 };
 
-const tryRestartGame = (gameData:GameData) => {
-    if (gameData.isGameOver && timeSinceOnlyOnPlayerStillInTheGame(gameData) > 3000) {
-        gameData.isGameOver = false;
-        gameData.elapsedTime = 0;
-        gameData.players.forEach(p => p.score = 0);
-        return true;
-    }
-    return false;
+const canRestartGame = (gameData:GameData) => {
+    return gameData.isGameOver && timeSinceOnlyOnPlayerStillInTheGame(gameData) > 3000;
 }
 
 const startEditMode = async (resources:Resources) => {
@@ -140,7 +142,7 @@ function main() {
     else {
         // ENTER GAMING MODE
         let levelname = getLevelNameOrDefault("level");
-        startGame(defineResources(levelname));
+        startFromLogo(defineResources(levelname));
     }
 };
 

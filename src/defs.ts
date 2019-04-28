@@ -119,6 +119,7 @@ export const createSounds = (catalog?:SoundCatalog) => {
 
     function music() {
         if (!catalog) return;
+        catalog.music.stop();
         catalog.music.play();
     }
 
