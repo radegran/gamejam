@@ -121,6 +121,7 @@ export const createSounds = (catalog?:SoundCatalog) => {
         if (!catalog) return;
         catalog.music.stop();
         catalog.music.play();
+        catalog.gameover.stop();
     }
 
     return {
