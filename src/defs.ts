@@ -114,6 +114,7 @@ export const createSounds = (catalog?:SoundCatalog) => {
 
     function roundover() {
         if (!catalog) return;
+        catalog.roundover.volume(0.7);
         catalog.roundover.play();
     }
 
