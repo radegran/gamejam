@@ -272,6 +272,7 @@ export const stepState = (dt:number, gameData:GameData, resources:Resources) => 
     if (playerLead.pos.x > gameData.heightMap.count()) {
         resources.sounds.startGame();
         resetPlayersOnGround(gameData.players, gameData.heightMap, 1);
+        gameData.camFocus = {x:1, y:gameData.heightMap.get(1)};
         return;
     }
 

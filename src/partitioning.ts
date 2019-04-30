@@ -44,9 +44,13 @@ export const setupPartitions = (canvasWidth:number, viewPortWidth:number, layers
 
     const applyTransitionUsingPartitions = (pFrom:number, pTo:number) => {
         if (pFrom !== pTo) {
-            let transition = partitionTransitions[partitionKey(pFrom, pTo)];
-            if (!!transition) {
-                transition.forEach(action => action());
+            let direction = Math.sign(pTo - pFrom);
+
+            for (let pNext = pFrom; pNext !== pTo; pNext += direction) {
+                let transition = partitionTransitions[partitionKey(pNext, pNext + direction)];
+                if (!!transition) {
+                    transition.forEach(action => action());
+                }
             }
         }
     };
