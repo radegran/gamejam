@@ -1,6 +1,6 @@
 import { ViewPort } from "./viewport";
 import SVG from "svgjs";
-import { LayerDefinition, Point, GameData, PLAYER_HEIGHT, Player, VIEWPORT_WIDTH, PLAYER_WIDTH, Resources, playerSvgs } from "./defs";
+import { LayerDefinition, Point, GameData, PLAYER_HEIGHT, Player, VIEWPORT_WIDTH, PLAYER_WIDTH, Resources, playerSvgs, getMaxScore } from "./defs";
 import { setupPartitions } from "./partitioning";
 import { loadSvg, isStillInTheGame, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
 
@@ -15,11 +15,13 @@ const showRoundResults = (s:SVG.Doc, viewPort:ViewPort, players:Array<Player>, i
             .translate(-5*VIEWPORT_WIDTH/2, -5*VIEWPORT_WIDTH/2)
             .opacity(0.8)
             .fill("white");
+
+        let maxScore = getMaxScore(players.length);
         
         // sort, make winner first
         let circleSize = 0.5;
         let rowHeight = PLAYER_HEIGHT * 1.5;
-        let leftAlign = -PLAYER_WIDTH - circleSize*10*1.25/2;
+        let leftAlign = -PLAYER_WIDTH - circleSize*maxScore*1.25/2;
         let topAlign = -rowHeight * players.length / 2 + PLAYER_HEIGHT / 2;
 
         players.forEach((p, i) => {
@@ -27,7 +29,7 @@ const showRoundResults = (s:SVG.Doc, viewPort:ViewPort, players:Array<Player>, i
             loadPlayerSvg(row.group().style("color", p.accentColor), playerSvgs(resources)[i]);
 
             let points = row.group();
-            for (var i = 0; i < 10; i++) {
+            for (var i = 0; i < maxScore; i++) {
                 let circleSize = 0.5;
                 let circle = points.circle(circleSize)
                     .stroke({width:0.05, color: p.accentColor})

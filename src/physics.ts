@@ -1,4 +1,4 @@
-import { GameData, Point, GRAVITY, PLAYER_HEIGHT, Player, HeightMap, PLAYER_WIDTH, VIEWPORT_WIDTH, Resources } from "./defs";
+import { GameData, Point, GRAVITY, PLAYER_HEIGHT, Player, HeightMap, PLAYER_WIDTH, VIEWPORT_WIDTH, Resources, getMaxScore } from "./defs";
 import { isStillInTheGame, timeSinceOnlyOnPlayerStillInTheGame, playersSortByRoundWinner } from "./util";
 import { resetPlayersOnGround } from "./heightmap";
 
@@ -293,7 +293,7 @@ export const stepState = (dt:number, gameData:GameData, resources:Resources) => 
                     let playersCopy = playersSortByRoundWinner(gameData.players);
                     playersCopy.forEach((p, i) => {
                         p.score = p.score + playersCopy.length - i - 1;
-                        if (p.score >= 10) {
+                        if (p.score >= getMaxScore(gameData.players.length)) {
                             gameData.isGameOver = true;
                         } 
                     });

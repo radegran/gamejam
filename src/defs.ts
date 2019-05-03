@@ -177,6 +177,19 @@ export const playerSvgs = (resources:Resources) => [
     resources.player4Svg
 ]
 
+export const getMaxScore = (numPlayers:number) => {
+    switch (numPlayers) {
+        case 1:
+            return 5;
+        case 2: 
+            return 6;
+        case 3:
+            return 8;
+        default:
+            return 10;
+    }
+};
+
 export type Resources = ReturnType<typeof defineResources>;
 
 export interface PointCallback {
