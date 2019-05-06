@@ -100,25 +100,48 @@ export const logo = async (resources:Resources) => {
     welcomeDiv.remove();
 };
 
-export const welcomeScreen = async (resources:Resources) => {
+const mainWelcomeScreen = async (resources:Resources) => {
     let welcomeDiv = makeDiv("welcome");
     let keyBoard = createKeyboardInput();
     
     resources.sounds.music();
-    await new Promise(resolve => keyBoard.onKeyDown(32, resolve));
+    let pushedButton = await new Promise<number>(resolve => {
+        keyBoard.onKeyDown(32, () => resolve(32));
+        keyBoard.onKeyDown(73, () => resolve(73));
+        keyBoard.onKeyDown(65, () => resolve(65));
+    });
 
     keyBoard.off();
     welcomeDiv.remove();
+
+    return pushedButton;
 };
 
-export const story = async (storyname:string) => {
-    let story = makeDiv(storyname);
+export const welcomeScreen = async (resources:Resources) => {
+
+    let pushedButton:number = 0;
+    while (pushedButton !== 32) {
+        pushedButton = await mainWelcomeScreen(resources);
+
+        if (pushedButton == 73) {
+            await showScreen("instructions");
+        } else if (pushedButton == 65) {
+            await showScreen("about");
+        }
+    }
+};
+
+export const showScreen = async (screenName:string) => {
+    let screen = makeDiv(screenName);
     let keyBoard = createKeyboardInput();
     
-    await new Promise(resolve => keyBoard.onKeyDown(32, resolve));
+    await new Promise(resolve => {
+        keyBoard.onKeyDown(32, resolve);
+        keyBoard.onKeyDown(27, resolve);
+    });
 
     keyBoard.off();
-    story.remove();
+    screen.remove();
 };
 
 export const selectPlayers = async (s:SVG.Doc, resources:Resources) => {

@@ -2,6 +2,28 @@ body {
     margin: 0;
 }
 
+.instructions {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(instructions.svg);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.about {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(about.svg);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 .welcome {
     position: absolute;
     top: 0;
