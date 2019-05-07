@@ -1,7 +1,7 @@
 import { Editor } from "./editor";
 import { createKeyboardInput, bindPlayerKeyboardInput } from "./keyboardinput";
 import { GameLoop } from "./gameloop";
-import { createGameData, createLayers, GameData, Resources, defineResources } from "./defs";
+import { createGameData, createLayers, GameData, Resources, defineResources, createPlayerDefinitions } from "./defs";
 import { createViewPort } from "./viewport";
 import { createPathDrawer } from "./editor-graphics";
 import { createHeightMap, resetPlayersOnGround } from "./heightmap";
@@ -10,7 +10,7 @@ import SVG from "svgjs";
 import { test } from "./test";
 import { createView } from "./view";
 import { loadSvg, loadLevelJson, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
-import { welcomeScreen, selectPlayers, createPlayerDefinitions, showScreen, logo } from "./welcome";
+import { welcomeScreen, selectPlayers, showScreen, logo } from "./welcome";
 
 async function startFromLogo(resources:Resources) {
     await logo(resources);
@@ -85,7 +85,7 @@ const startEditMode = async (resources:Resources) => {
     let heightMap = resources.levelJson ?  await loadLevelJson(resources.levelJson) : createHeightMap(1500);
     let viewPort = createViewPort(s, layers);
 
-    let defaultPlayers = [createPlayerDefinitions()[2]]
+    let defaultPlayers = [createPlayerDefinitions()[2]];
     
     // Editor
     let pathDrawer = createPathDrawer(s, heightMap, layers);

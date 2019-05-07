@@ -1,31 +1,8 @@
 import { createKeyboardInput } from "./keyboardinput";
-import { PLAYER_HEIGHT, PlayerDef, Resources, playerSvgs, createSounds } from "./defs";
+import { PLAYER_HEIGHT, PlayerDef, Resources, createSounds, createPlayerDefinitions, staticResources } from "./defs";
 import SVG from "svgjs";
 import { loadPlayerSvg } from "./view";
 import { loadSvg, loadLevelJson } from "./util";
-
-export const createPlayerDefinitions = ():Array<PlayerDef> => {
-    let players = [
-        {
-            keyMap: {right: 90, left: 81, up: 83},
-            accentColor: "#e46167"
-        },
-        {
-            keyMap: {right: 78, left: 86, up: 71},
-            accentColor: "#c47ec2"
-        },
-        {
-            keyMap: {right: 39, left: 37, up: 38},
-            accentColor: "#48baec"
-        },
-        {
-            keyMap: {right: 104, left: 98, up: 100},
-            accentColor: "#78bc78"
-        }
-    ];
-
-    return players;
-};
 
 const makeDiv = (className:string) => {
     let div = document.createElement("div");
@@ -59,9 +36,10 @@ const preLoadResources = async (resources:Resources) => {
     }
 
     awaitParallel(async () => await loadSvg(resources.levelSvg));
-    playerSvgs(resources).forEach(playerSvg => {
-        awaitParallel(async () => await loadSvg(playerSvg));
-    });
+    awaitParallel(async () => await loadSvg(staticResources["player1Svg"]));
+    awaitParallel(async () => await loadSvg(staticResources["player2Svg"]));
+    awaitParallel(async () => await loadSvg(staticResources["player3Svg"]));
+    awaitParallel(async () => await loadSvg(staticResources["player4Svg"]));
     awaitParallel(async () => await loadLevelJson(resources.levelJson));
     awaitParallel(async () => await new Promise(res => setTimeout(res, 3000)));
 
@@ -167,7 +145,7 @@ export const selectPlayers = async (s:SVG.Doc, resources:Resources) => {
             .translate(-2.5 + i*5/3, PLAYER_HEIGHT/2)
             .opacity(0.3)
             .style("color", p.accentColor);
-        loadPlayerSvg(g, playerSvgs(resources)[i]);
+        loadPlayerSvg(g, p.svgName);
         toCleanup.push(g);
 
         let action = participate(p, g);

@@ -1,6 +1,6 @@
 import { ViewPort } from "./viewport";
 import SVG from "svgjs";
-import { LayerDefinition, Point, GameData, PLAYER_HEIGHT, Player, VIEWPORT_WIDTH, PLAYER_WIDTH, Resources, playerSvgs, getMaxScore } from "./defs";
+import { LayerDefinition, Point, GameData, PLAYER_HEIGHT, Player, VIEWPORT_WIDTH, PLAYER_WIDTH, Resources, getMaxScore } from "./defs";
 import { setupPartitions } from "./partitioning";
 import { loadSvg, isStillInTheGame, timeSinceOnlyOnPlayerStillInTheGame } from "./util";
 
@@ -26,17 +26,17 @@ const showRoundResults = (s:SVG.Doc, viewPort:ViewPort, players:Array<Player>, i
 
         players.forEach((p, i) => {
             let row = innerElem.group().translate(leftAlign, topAlign + i*rowHeight);
-            loadPlayerSvg(row.group().style("color", p.accentColor), playerSvgs(resources)[i]);
+            loadPlayerSvg(row.group().style("color", p.definition.accentColor), p.definition.svgName);
 
             let points = row.group();
             for (var i = 0; i < maxScore; i++) {
                 let circleSize = 0.5;
                 let circle = points.circle(circleSize)
-                    .stroke({width:0.05, color: p.accentColor})
+                    .stroke({width:0.05, color: p.definition.accentColor})
                     .fill("transparent")
                     .translate(PLAYER_WIDTH + i*circleSize*1.25, -PLAYER_HEIGHT/2 - circleSize/2);
                 if (p.score > i) {
-                    circle.fill(p.accentColor);
+                    circle.fill(p.definition.accentColor);
                 }
             }
         });
@@ -107,8 +107,8 @@ export const createView = (viewPort:ViewPort, s:SVG.Doc, layers:Array<LayerDefin
 
         playerSvgGroups = gameData.players.map((player, i) => {
             let g = (s.select("#player-layer").get(0) as SVG.G).group();
-            g.style("color", player.accentColor);
-            loadPlayerSvg(g, playerSvgs(resources)[i]);
+            g.style("color", player.definition.accentColor);
+            loadPlayerSvg(g, player.definition.svgName);
             return g;
         });    
     };

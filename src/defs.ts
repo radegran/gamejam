@@ -9,15 +9,51 @@ interface NumCallback {
 
 export interface PlayerDef {
     keyMap: KeyboardMap,
-    accentColor: string
+    accentColor: string,
+    svgName: string
 }
 
 export type Player = ReturnType<typeof createPlayer>;
 
+export const createPlayerDefinitions = ():Array<PlayerDef> => {
+    let players = [
+        {
+            keyMap: {right: 90, left: 81, up: 83},
+            accentColor: "#e46167",
+            svgName: staticResources["player1Svg"]
+        },
+        {
+            keyMap: {right: 78, left: 86, up: 71},
+            accentColor: "#c47ec2",
+            svgName: staticResources["player2Svg"]
+        },
+        {
+            keyMap: {right: 39, left: 37, up: 38},
+            accentColor: "#48baec",
+            svgName: staticResources["player3Svg"]
+        },
+        {
+            keyMap: {right: 104, left: 98, up: 100},
+            accentColor: "#78bc78",
+            svgName: staticResources["player4Svg"]
+        }
+    ];
+
+    return players;
+};
+
 export const createPlayer = () => ({
     score: 0,
     droppedOutTime: -1,
-    accentColor: "",
+    definition: {
+        keyMap: {
+            right: 0,
+            left: 0,
+            up: 0
+        },
+        accentColor: "black",
+        svgName: "..."
+    },
     pos: {x:0, y:0},
     vel: {x:0, y:0},
     angle: 0,
@@ -35,7 +71,7 @@ export const createGameData = (heightMap:HeightMap, playerDefs:Array<PlayerDef>)
     
     let players:Array<Player> = playerDefs.map(def => {
         let p = createPlayer();
-        p.accentColor = def.accentColor;
+        p.definition = def;
         return p;
     });
 
@@ -139,22 +175,25 @@ export const createSounds = (catalog?:SoundCatalog) => {
 
 export type Sound = ReturnType<typeof createSounds>;
 
+export const staticResources = {
+    player1Svg: "player-1.svg",
+    player2Svg: "player-2.svg",
+    player3Svg: "player-3.svg",
+    player4Svg: "player-4.svg",
+    music: "music.mp3",
+    collide: "collide.mp3",
+    gameover: "gameover.mp3",
+    jump: "jump.mp3",
+    land: "land.mp3",
+    pickninja0: "pickninja0.mp3",
+    pickninja1: "pickninja1.mp3",
+    roundover: "roundover.mp3"
+};
+
 export const defineResources = (levelname:string) => {
-    return {
+    return {...staticResources, 
         levelSvg: "levels/" + levelname + ".svg",
-        player1Svg: "player-1.svg",
-        player2Svg: "player-2.svg",
-        player3Svg: "player-3.svg",
-        player4Svg: "player-4.svg",
         levelJson: levelname ? "levels/" + levelname + ".json" : "",
-        music: "music.mp3",
-        collide: "collide.mp3",
-        gameover: "gameover.mp3",
-        jump: "jump.mp3",
-        land: "land.mp3",
-        pickninja0: "pickninja0.mp3",
-        pickninja1: "pickninja1.mp3",
-        roundover: "roundover.mp3",
         sounds: createSounds()
     };
 }
@@ -169,13 +208,6 @@ export interface SoundCatalog {
     pickninja1: Howl,
     roundover: Howl
 }
-
-export const playerSvgs = (resources:Resources) => [
-    resources.player1Svg,
-    resources.player2Svg,
-    resources.player3Svg,
-    resources.player4Svg
-]
 
 export const getMaxScore = (numPlayers:number) => {
     switch (numPlayers) {

@@ -280,7 +280,7 @@ export const stepState = (dt:number, gameData:GameData, resources:Resources) => 
 
     let f = gameData.camFocus;
     remainingPlayers.forEach(p => {
-        if (p.accentColor === playerLead.accentColor) {
+        if (p.definition.accentColor === playerLead.definition.accentColor) {
             return;
         }
 
